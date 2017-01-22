@@ -3,6 +3,7 @@ import errno
 import os
 
 
+<<<<<<< HEAD
 class Error(Exception):
     """Base class for exceptions in this module."""
     pass
@@ -21,6 +22,8 @@ class InputError(Error):
         self.msg = msg
 
 
+=======
+>>>>>>> cc6d1cf8d6beb38522c8f72354439128485d129f
 def is_file(f):
     try:
         open(f, 'r')  # return an open file handle
