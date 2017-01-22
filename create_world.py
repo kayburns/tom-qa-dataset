@@ -225,19 +225,19 @@ def write_world(filepath, locs, objs, conts, nams):
             f.write('create %s\n' % nam)
             f.write('set %s is_actor\n' % nam)
             f.write('set %s is_god\n' % nam)
-    
-write_world('world_tiny.txt', 
+
+write_world('world_tiny.txt',
             np.random.choice(locations, SIZE_TINY, replace=False),
             np.random.choice(objects, SIZE_TINY, replace=False),
             np.random.choice(containers, SIZE_TINY, replace=False),
             np.random.choice(names, SIZE_TINY, replace=False))
-    
-write_world('world_small.txt', 
+
+write_world('world_small.txt',
             np.random.choice(locations, SIZE_SMALL, replace=False),
             np.random.choice(objects, SIZE_SMALL, replace=False),
             np.random.choice(containers, SIZE_SMALL, replace=False),
             np.random.choice(names, SIZE_SMALL, replace=False))
-    
+
 write_world('world_large.txt', 
             np.random.choice(locations, SIZE_LARGE, replace=False),
             np.random.choice(objects, SIZE_LARGE, replace=False),
