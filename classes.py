@@ -6,97 +6,96 @@ class Action(object):
     def __init__(self, templates):
         self.templates = templates
 
-    def render(self, *args):
-        assert len(self.templates) > 0
-        return np.random.choice(self.templates) % args
+    def render_declarative(self, *args):
+        assert 'declarative' in self.templates and len(self.templates['declarative']) > 0
+        return np.random.choice(self.templates['declarative']) % args
+
+    def render_interrogative(self, *args):
+        assert 'interrogative' in self.templates and len(self.templates['interrogative']) > 0
+        return np.random.choice(self.templates['interrogative']) % args
 
 
 class PlaceAction(Action):
 
     def __init__(self):
-        templates = [
-            '%s placed the %s in the %s.',
-            '%s put the %s in the %s.',
-        ]
+        templates = {
+            'declarative': [
+                '%s placed the %s in the %s.',
+                '%s put the %s in the %s.',
+            ],
+            'interrogative': [
+                'Where did %s place the %s?\t%s',
+                'Where did %s put the %s?\t%s',
+            ]
+        }
         super().__init__(templates)
 
-
-class EvalPlaceAction(Action):
-
-    def __init__(self):
-        templates = [
-            'Where did %s place the %s?\t%s',
-            'Where did %s put the %s?\t%s',
-        ]
-        super().__init__(templates)
 
 class SearchAction(Action):
 
     def __init__(self):
-        templates = [
-            '%s searched for the %s in the %s.',
-            '%s looked for the %s in the %s.',
-        ]
-        super().__init__(templates)
-
-
-class EvalSearchAction(Action):
-
-    def __init__(self):
-        templates = [
-            'Where did %s search for the %s?\t%s',
-            'Where did %s look for the %s?\t%s',
-        ]
+        templates = {
+            'declarative': [
+                '%s searched for the %s in the %s.',
+                '%s looked for the %s in the %s.',
+            ],
+            'interrogative': [
+                'Where did %s search for the %s?\t%s',
+                'Where did %s look for the %s?\t%s',
+            ],
+        }
         super().__init__(templates)
 
 
 class TransportAction(Action):
 
     def __init__(self):
-        templates = [
-            '%s shifted the %s from the %s to the %s.',
-        ]
+        templates = {
+            'declarative': [
+                '%s shifted the %s from the %s to the %s.',
+            ],
+        }
         super().__init__(templates)
 
 
 class EnterAction(Action):
 
     def __init__(self):
-        templates = [
-            '%s entered the %s.',
-            '%s came into the %s.',
-        ]
+        templates = {
+            'declarative': [
+                '%s entered the %s.',
+                '%s came into the %s.',
+            ],
+        }
         super().__init__(templates)
 
 
 class ExitAction(Action):
 
     def __init__(self):
-        templates = [
-            '%s exited the %s.',
-            '%s left the %s.',
-            '%s went out of the %s.',
-        ]
+        templates = {
+            'declarative': [
+                '%s exited the %s.',
+                '%s left the %s.',
+                '%s went out of the %s.',
+            ],
+        }
         super().__init__(templates)
 
 
 class BelieveLocationAction(Action):
 
     def __init__(self):
-        templates = [
-            '%s thinks the %s is in the %s.',
-            '%s believes the %s is in the %s.',
-        ]
-        super().__init__(templates)
-
-
-class EvalBelieveLocationAction(Action):
-
-    def __init__(self):
-        templates = [
-            'Where does %s think the %s is?\t%s',
-            'Where does %s believe the %s is?\t%s',
-        ]
+        templates = {
+            'declarative': [
+                '%s thinks the %s is in the %s.',
+                '%s believes the %s is in the %s.',
+            ],
+            'interrogative': [
+                'Where does %s think the %s is?\t%s',
+                'Where does %s believe the %s is?\t%s',
+            ],
+        }
         super().__init__(templates)
 
 
@@ -202,20 +201,16 @@ class World(object):
 
 class Clause(object):
 
-    def __init__(self, world, truth_value, attend_to, actor, action, *args):
+    def __init__(self, world, truth_value, actor, action, *args):
 
         self.world = world
-        self.attend_to = attend_to
         self.truth_value = truth_value
         self.actor = actor
         self.action = action
         self.args = args
 
     def render(self):
-        s = self.action.render(self.actor, *self.args)
-        if self.attend_to:
-            s += ' *'
-        return s
+        return self.action.render_declarative(self.actor, *self.args)
 
     def is_valid(self):
         return self.action.is_valid(self.world, self.actor, *self.args)
@@ -238,6 +233,16 @@ class Clause(object):
             args = []
 
             raise NotImplementedError #TODO
+
+
+class Question(Clause):
+
+    def __init__(self, idx_support, actor, action, *args):
+        self.idx_support = idx_support
+        super().__init__(None, None, actor, action, *args)
+
+    def render(self):
+        return self.action.render_interrogative(self.actor, *self.args)
 
 
 class Task(object):
@@ -271,6 +276,7 @@ class ActionsBeliefsTask(Task):
 
         while num_questions < self.num_questions:
 
+            idx_support = []
             clauses = []
 
             random_actors = np.random.choice(actors, size=2, replace=False)
@@ -282,7 +288,10 @@ class ActionsBeliefsTask(Task):
 
             do_search = np.random.choice([True, False], p=[self.search_prob, 1 - self.search_prob])
 
-            random_containers = np.random.choice(containers, size=3, replace=False)
+            if do_search:
+                random_containers = np.random.choice(containers, size=3, replace=False)
+            else:
+                random_containers = np.random.choice(containers, size=2, replace=False)
 
             if do_search:
 
@@ -291,7 +300,6 @@ class ActionsBeliefsTask(Task):
                     Clause(
                         world,
                         True,
-                        False,
                         random_actors[0],
                         SearchAction(),
                         random_object,
@@ -303,7 +311,6 @@ class ActionsBeliefsTask(Task):
                 Clause(
                     world,
                     True,
-                    True,
                     random_actors[0],
                     PlaceAction(),
                     random_object,
@@ -313,24 +320,30 @@ class ActionsBeliefsTask(Task):
 
             if exit_enter:
 
+                # Support is "placed" clause
+                idx_support += [len(story) + len(clauses) - 1]
+
                 # Person A exits the location
                 clauses.append(
                     Clause(
                         world,
                         True,
-                        False,
                         random_actors[0],
                         ExitAction(),
                         random_location,
                     )
                 )
 
+            else:
+
+                # Support is "moved" clause
+                idx_support += [len(story) + len(clauses)]
+
             # Person B moves the item from container X to container Y
             clauses.append(
                 Clause(
                     world,
                     True,
-                    False,
                     random_actors[1],
                     TransportAction(),
                     random_object,
@@ -346,7 +359,6 @@ class ActionsBeliefsTask(Task):
                     Clause(
                         world,
                         True,
-                        False,
                         random_actors[0],
                         EnterAction(),
                         random_location,
@@ -355,7 +367,7 @@ class ActionsBeliefsTask(Task):
 
             # Update the state of the world
             for clause in clauses:
-                #clause:perform() # TODO
+                #clause.perform() # TODO
                 pass
             story.extend(clauses)
 
@@ -363,14 +375,12 @@ class ActionsBeliefsTask(Task):
 
                 # question: where does person A believe is the item?
                 story.append(
-                    Clause(
-                        world,
-                        True,
-                        False,
+                    Question(
+                        idx_support,
                         random_actors[0],
-                        EvalBelieveLocationAction(),
+                        BelieveLocationAction(),
                         random_object,
-                        random_containers[0]
+                        random_containers[0],
                     )
                 )
 
@@ -378,14 +388,12 @@ class ActionsBeliefsTask(Task):
 
                 # question: where does person A believe is the item?
                 story.append(
-                    Clause(
-                        world,
-                        True,
-                        False,
+                    Question(
+                        idx_support,
                         random_actors[0],
-                        EvalBelieveLocationAction(),
+                        BelieveLocationAction(),
                         random_object,
-                        random_containers[1]
+                        random_containers[1],
                     )
                 )
 
@@ -413,6 +421,7 @@ class BeliefsActionsTask(Task):
 
         while num_questions < self.num_questions:
 
+            idx_support = []
             clauses = []
 
             random_actors = np.random.choice(actors, size=2, replace=False)
@@ -430,7 +439,6 @@ class BeliefsActionsTask(Task):
                     Clause(
                         world,
                         True,
-                        True,
                         random_actors[0],
                         BelieveLocationAction(),
                         random_object,
@@ -438,12 +446,14 @@ class BeliefsActionsTask(Task):
                     )
                 )
 
+                # Support is false "belief" clause
+                idx_support += [len(story) + len(clauses) - 1]
+
                 # Person A exits the location
                 clauses.append(
                     Clause(
                         world,
                         True,
-                        False,
                         random_actors[0],
                         ExitAction(),
                         random_location
@@ -455,7 +465,6 @@ class BeliefsActionsTask(Task):
                 Clause(
                     world,
                     True,
-                    False,
                     random_actors[1],
                     TransportAction(),
                     random_object,
@@ -471,7 +480,6 @@ class BeliefsActionsTask(Task):
                     Clause(
                         world,
                         True,
-                        False,
                         random_actors[0],
                         EnterAction(),
                         random_location
@@ -485,17 +493,19 @@ class BeliefsActionsTask(Task):
                     Clause(
                         world,
                         True,
-                        True,
                         random_actors[0],
                         BelieveLocationAction(),
                         random_object,
                         random_containers[1]
                     )
                 )
-                
+
+                # Support is true "belief" clause
+                idx_support += [len(story) + len(clauses) - 1]
+
             # Update the state of the world
             for clause in clauses:
-                #clause:perform() # TODO
+                #clause.perform() # TODO
                 pass
             story.extend(clauses)
 
@@ -503,28 +513,24 @@ class BeliefsActionsTask(Task):
             if exit_enter:
 
                 story.append(
-                    Clause(
-                        world,
-                        True,
-                        False,
+                    Question(
+                        idx_support,
                         random_actors[0],
-                        EvalSearchAction(),
+                        SearchAction(),
                         random_object,
-                        random_containers[0]
+                        random_containers[0],
                     )
                 )
 
             else:
 
                 story.append(
-                    Clause(
-                        world,
-                        True,
-                        False,
+                    Question(
+                        idx_support,
                         random_actors[0],
-                        EvalSearchAction(),
+                        SearchAction(),
                         random_object,
-                        random_containers[1]
+                        random_containers[1],
                     )
                 )
 
@@ -552,6 +558,7 @@ class ActionsBeliefsActionsTask(Task):
 
         while num_questions < self.num_questions:
 
+            idx_support = []
             clauses = []
 
             random_actors = np.random.choice(actors, size=2, replace=False)
@@ -562,16 +569,10 @@ class ActionsBeliefsActionsTask(Task):
             # whether or not the person will maintain a false belief
             exit_enter = np.random.choice([True, False], p=[self.exit_prob, 1 - self.exit_prob])
 
-            if exit_enter:
-                attend_1 = True
-            else:
-                attend_1 = False
-
             # person A drops the item in container X
             clauses.append(
                 Clause(world,
                     True,
-                    attend_1,
                     random_actors[0],
                     PlaceAction(),
                     random_object,
@@ -581,11 +582,13 @@ class ActionsBeliefsActionsTask(Task):
 
             if exit_enter:
 
+                # Support is "placed" clause
+                idx_support += [len(story) + len(clauses) - 1]
+
                 # person A exits the location
                 clauses.append(
                     Clause(world,
                         True,
-                        False,
                         random_actors[0],
                         ExitAction(),
                         random_location
@@ -597,7 +600,6 @@ class ActionsBeliefsActionsTask(Task):
                 Clause(
                     world,
                     True,
-                    not attend_1,
                     random_actors[1],
                     TransportAction(),
                     random_object,
@@ -613,16 +615,20 @@ class ActionsBeliefsActionsTask(Task):
                     Clause(
                         world,
                         True,
-                        False,
                         random_actors[0],
                         EnterAction(),
                         random_location
                     )
                 )
 
+            else:
+                
+                # Support is "transported" clause
+                idx_support += [len(story) + len(clauses) - 1]
+
             # Update the state of the world
             for clause in clauses:
-                #clause:perform() # TODO
+                #clause.perform() # TODO
                 pass
             story.extend(clauses)
 
@@ -630,14 +636,12 @@ class ActionsBeliefsActionsTask(Task):
 
                 # question: where does person A seach for the item?
                 story.append(
-                    Clause(
-                        world,
-                        True,
-                        False,
+                    Question(
+                        idx_support,
                         random_actors[0],
-                        EvalSearchAction(),
+                        SearchAction(),
                         random_object,
-                        random_containers[0]
+                        random_containers[0],
                     )
                 )
 
@@ -645,14 +649,12 @@ class ActionsBeliefsActionsTask(Task):
 
                 # question: where does person A seach for the item?
                 story.append(
-                    Clause(
-                        world,
-                        True,
-                        False,
+                    Question(
+                        idx_support,
                         random_actors[0],
-                        EvalSearchAction(),
+                        SearchAction(),
                         random_object,
-                        random_containers[1]
+                        random_containers[1],
                     )
                 )
 
@@ -673,25 +675,24 @@ def stringify(story):
 
         line = story[i].render()
 
+        # Capitalize the line
+        line = line[0].upper() + line[1:]
+
         # Prepend the number
-        line = '%d %s' % (i+1, line)
+        line = '%d %s' % (i + 1, line)
+
+        # Append support if necessary
+        if isinstance(story[i], Question) and story[i].idx_support is not None:
+            line += '\t%s' % ', '.join([str(x + 1) for x in story[i].idx_support])
 
         lines.append(line)
 
-        # Keep track of where clauses were rendered
-        #for k = i, i + template.clauses - 1 do
-        #clause_lines[story[k]] = j
-        #end
-
         # Increment counters
-        #i = i + template.clauses #TODO
         i += 1
+        #j += template.clauses #TODO: handle multiple-clause templates
         j += 1
 
         if i >= len(story):
             break
-
-    #lines = tablex.map(capitalize, lines)
-    #lines = add_line_numbers(lines)
 
     return lines
