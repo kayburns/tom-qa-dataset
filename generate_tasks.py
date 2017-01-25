@@ -1,3 +1,4 @@
+"""python generate_tasks.py -sa -w worlds/world_tiny.txt -w worlds/world_small.txt -w worlds/world_large.txt -n 1000 -n 10000 -ps 0. -ps .5 -ps 1. -pe 0. -pe .5 -pe 1."""
 import argparse
 import logging
 import numpy as np
@@ -33,6 +34,8 @@ def generate_sally_anne_tasks(world_paths,
             for exit_prob in exit_prob_choices:
                 for search_prob in search_prob_choices:
 
+                    num_questions = 5
+
                     folder_name = '%s_nex_%d_exitp_%.2f_searchp_%.2f' % (world_name, num_stories, exit_prob, search_prob)
 
                     logging.info("Creating Sally-Anne task in %s..." % folder_name)
@@ -51,7 +54,7 @@ def generate_sally_anne_tasks(world_paths,
                         story.extend(
                             stringify(task(exit_prob=exit_prob, search_prob=search_prob).generate_story(w, None))
                         )
-                        i += 1
+                        i += 1 * num_questions
                     story = '\n'.join(story)
 
                     with open(os.path.join(output_dir_path, folder_name, filename), 'w') as f:
@@ -70,7 +73,7 @@ def generate_sally_anne_tasks(world_paths,
                         story.extend(
                             stringify(task(exit_prob=exit_prob, search_prob=search_prob).generate_story(w, None))
                         )
-                        i += 1
+                        i += 1 * num_questions
                     story = '\n'.join(story)
 
                     with open(os.path.join(output_dir_path, folder_name, filename), 'w') as f:
@@ -89,7 +92,7 @@ def generate_sally_anne_tasks(world_paths,
                         story.extend(
                             stringify(task(exit_prob=exit_prob, search_prob=search_prob).generate_story(w, None))
                         )
-                        i += 1
+                        i += 1 * num_questions
                     story = '\n'.join(story)
 
                     with open(os.path.join(output_dir_path, folder_name, filename), 'w') as f:
@@ -109,7 +112,7 @@ def generate_sally_anne_tasks(world_paths,
                         story.extend(
                             stringify(task(exit_prob=exit_prob, search_prob=search_prob).generate_story(w, None))
                         )
-                        i += 1
+                        i += 1 * num_questions
                     story = '\n'.join(story)
 
                     with open(os.path.join(output_dir_path, folder_name, filename), 'w') as f:
@@ -130,7 +133,7 @@ def generate_sally_anne_tasks(world_paths,
                         story.extend(
                             stringify(task(exit_prob=exit_prob, search_prob=search_prob).generate_story(w, None))
                         )
-                        i += 1
+                        i += 1 * num_questions
                     story = '\n'.join(story)
 
                     with open(os.path.join(output_dir_path, folder_name, filename), 'w') as f:
@@ -148,7 +151,7 @@ def generate_sally_anne_tasks(world_paths,
                         story.extend(
                             stringify(task(exit_prob=1.).generate_story(w, None))
                         )
-                        i += 1
+                        i += 1 * num_questions
                     story = '\n'.join(story)
 
                     test_filenames = [

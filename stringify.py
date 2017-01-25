@@ -1,9 +1,6 @@
 import numpy as np
 
 
-from clause import Question
-
-
 #def stringify(story, knowledge, config):
 def stringify(story):
 
@@ -23,8 +20,8 @@ def stringify(story):
         line = '%d %s' % (i + 1, line)
 
         # Append support if necessary
-        if isinstance(story[i], Question) and story[i].idx_support is not None:
-            line += '\t%s' % ', '.join([str(x + 1) for x in story[i].idx_support])
+        if hasattr(story[i], 'idx_support') and story[i].idx_support is not None:
+            line += '\t%s' % ' '.join([str(x + 1) for x in story[i].idx_support])
 
         lines.append(line)
 
