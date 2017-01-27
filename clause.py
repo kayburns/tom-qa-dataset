@@ -3,16 +3,17 @@ import numpy as np
 
 class Clause(object):
 
-    def __init__(self, world, truth_value, actor, action, *args):
+    def __init__(self, world, truth_value, observers, actor, action, *args):
 
         self.world = world
         self.truth_value = truth_value
+        self.observers = observers
         self.actor = actor
         self.action = action
         self.args = args
 
     def render(self):
-        return self.action.render_declarative(self.actor, *self.args)
+        return self.action.render_declarative(self.actor, *self.args) + ('\t' + ' '.join([str(x) for x in self.observers]) if self.observers is not None else '')
 
     def is_valid(self):
         return self.action.is_valid(self.world, self.actor, *self.args)
@@ -41,7 +42,7 @@ class Question(Clause):
 
     def __init__(self, idx_support, actor, action, *args):
         self.idx_support = idx_support
-        super().__init__(None, None, actor, action, *args)
+        super().__init__(None, None, None, actor, action, *args)
 
     def render(self):
         return self.action.render_interrogative(self.actor, *self.args)

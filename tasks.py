@@ -5,16 +5,6 @@ from clause import Clause, Question
 from actions import *
 
 
-class Question(Clause):
-
-    def __init__(self, idx_support, actor, action, *args):
-        self.idx_support = idx_support
-        super().__init__(None, None, actor, action, *args)
-
-    def render(self):
-        return self.action.render_interrogative(self.actor, *self.args)
-
-
 class Task(object):
 
     def __init__(self, world):
@@ -70,6 +60,7 @@ class ActionsBeliefsTask(Task):
                     Clause(
                         world,
                         True,
+                        [1, 2],
                         random_actors[0],
                         SearchAction(),
                         random_object,
@@ -81,6 +72,7 @@ class ActionsBeliefsTask(Task):
                 Clause(
                     world,
                     True,
+                    [1, 2],
                     random_actors[0],
                     PlaceAction(),
                     random_object,
@@ -98,6 +90,7 @@ class ActionsBeliefsTask(Task):
                     Clause(
                         world,
                         True,
+                        [1, 2],
                         random_actors[0],
                         ExitAction(),
                         random_location,
@@ -114,6 +107,7 @@ class ActionsBeliefsTask(Task):
                 Clause(
                     world,
                     True,
+                    [1] if exit_enter else [1, 2],
                     random_actors[1],
                     TransportAction(),
                     random_object,
@@ -129,6 +123,7 @@ class ActionsBeliefsTask(Task):
                     Clause(
                         world,
                         True,
+                        [1, 2],
                         random_actors[0],
                         EnterAction(),
                         random_location,
@@ -209,6 +204,7 @@ class BeliefsActionsTask(Task):
                     Clause(
                         world,
                         True,
+                        [2],
                         random_actors[0],
                         BelieveLocationAction(),
                         random_object,
@@ -224,6 +220,7 @@ class BeliefsActionsTask(Task):
                     Clause(
                         world,
                         True,
+                        [1, 2],
                         random_actors[0],
                         ExitAction(),
                         random_location
@@ -235,6 +232,7 @@ class BeliefsActionsTask(Task):
                 Clause(
                     world,
                     True,
+                    [1] if exit_enter else [1, 2],
                     random_actors[1],
                     TransportAction(),
                     random_object,
@@ -250,6 +248,7 @@ class BeliefsActionsTask(Task):
                     Clause(
                         world,
                         True,
+                        [1, 2],
                         random_actors[0],
                         EnterAction(),
                         random_location
@@ -263,6 +262,7 @@ class BeliefsActionsTask(Task):
                     Clause(
                         world,
                         True,
+                        [2],
                         random_actors[0],
                         BelieveLocationAction(),
                         random_object,
@@ -343,6 +343,7 @@ class ActionsBeliefsActionsTask(Task):
             clauses.append(
                 Clause(world,
                     True,
+                    [1, 2],
                     random_actors[0],
                     PlaceAction(),
                     random_object,
@@ -359,6 +360,7 @@ class ActionsBeliefsActionsTask(Task):
                 clauses.append(
                     Clause(world,
                         True,
+                        [1, 2],
                         random_actors[0],
                         ExitAction(),
                         random_location
@@ -370,6 +372,7 @@ class ActionsBeliefsActionsTask(Task):
                 Clause(
                     world,
                     True,
+                    [1] if exit_enter else [1, 2],
                     random_actors[1],
                     TransportAction(),
                     random_object,
@@ -385,6 +388,7 @@ class ActionsBeliefsActionsTask(Task):
                     Clause(
                         world,
                         True,
+                        [1, 2],
                         random_actors[0],
                         EnterAction(),
                         random_location
