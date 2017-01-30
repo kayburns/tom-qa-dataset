@@ -224,12 +224,12 @@ def main(args=sys.argv[1:]):
     logging.basicConfig(level=args.logging, format='%(asctime)s\t%(levelname)-8s\t%(message)s')
 
     if args.sally_anne is True:
-        generate_sally_anne_tasks(args.world_paths,
-                                  os.path.join(args.output_dir_path, 'sally_anne'),
-                                  args.babi_dir_path,
-                                  args.num_stories_choices,
-                                  args.search_prob_choices,
-                                  args.exit_prob_choices,
+        generate_sally_anne_tasks(world_paths=args.world_paths,
+                                  output_dir_path=os.path.join(args.output_dir_path, 'sally_anne'),
+                                  babi_dir_path=args.babi_dir_path,
+                                  num_stories_choices=args.num_stories_choices,
+                                  exit_prob_choices=args.exit_prob_choices,
+                                  search_prob_choices=args.search_prob_choices,
                                  )
 
 
