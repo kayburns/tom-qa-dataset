@@ -1,6 +1,7 @@
 """python generate_tasks.py -sa -w worlds/world_tiny.txt -w worlds/world_small.txt -w worlds/world_large.txt -n 1000 -n 10000 -ps 0. -ps .5 -ps 1. -pe 0. -pe .5 -pe 1."""
 import argparse
 import logging
+import glob
 import numpy as np
 import os
 import sys
@@ -17,9 +18,11 @@ from world import World
 
 def generate_sally_anne_tasks(world_paths,
                               output_dir_path,
+                              babi_dir_path,
                               num_stories_choices,
                               exit_prob_choices,
                               search_prob_choices,
+                              num_questions=5,
                              ):
 
     mkdir_p(output_dir_path)
@@ -30,19 +33,50 @@ def generate_sally_anne_tasks(world_paths,
         w.load(world)
         world_name = remove_extension(world)
 
+        # Test
+        tasks = [
+            ActionsBeliefsActionsTask,
+        ]
+
+        true_belief_test_story = []
+        i = 0
+        while i < np.max(num_stories_choices):
+            task = np.random.choice(tasks)
+            true_belief_test_story.append(
+                '\n'.join(stringify(task(exit_prob=0.).generate_story(w, None)))
+            )
+            i += 1 * num_questions
+
+        false_belief_test_story = []
+        i = 0
+        while i < np.max(num_stories_choices):
+            task = np.random.choice(tasks)
+            false_belief_test_story.append(
+                '\n'.join(stringify(task(exit_prob=1.).generate_story(w, None)))
+            )
+            i += 1 * num_questions
+
         for num_stories in num_stories_choices:
             for exit_prob in exit_prob_choices:
                 for search_prob in search_prob_choices:
 
-                    num_questions = 5
-
                     folder_name = '%s_nex_%d_exitp_%.2f_searchp_%.2f' % (world_name, num_stories, exit_prob, search_prob)
-
                     logging.info("Creating Sally-Anne task in %s..." % folder_name)
                     mkdir_p(os.path.join(output_dir_path, folder_name))
 
+                    # Symlink the bAbi data
+                    babi_subdir = 'en' if num_stories < 5000 else 'en-10k'
+                    for filepath in glob.glob(os.path.join(babi_dir_path, babi_subdir, '*train.txt')):
+                        os.symlink(filepath, os.path.join(output_dir_path, folder_name, os.path.basename(filepath)))
+
+                    # Write test
+                    with open(os.path.join(output_dir_path, folder_name, 'true_belief_task_test.txt'), 'w') as f:
+                        f.write('\n'.join(true_belief_test_story[:int(num_stories / num_questions)]))
+                    with open(os.path.join(output_dir_path, folder_name, 'false_belief_task_test.txt'), 'w') as f:
+                        f.write('\n'.join(false_belief_test_story[:int(num_stories / num_questions)]))
+
                     # AB
-                    filename = 'qa1_task_AB_train.txt'
+                    filename = 'qa21_task_AB_train.txt'
                     tasks = [
                         ActionsBeliefsTask,
                     ]
@@ -61,7 +95,7 @@ def generate_sally_anne_tasks(world_paths,
                         f.write(story)
 
                     # BA
-                    filename = 'qa2_task_BA_train.txt'
+                    filename = 'qa22_task_BA_train.txt'
                     tasks = [
                         BeliefsActionsTask,
                     ]
@@ -80,7 +114,7 @@ def generate_sally_anne_tasks(world_paths,
                         f.write(story)
 
                     # ABA
-                    filename = 'qa3_task_ABA_train.txt'
+                    filename = 'qa23_task_ABA_train.txt'
                     tasks = [
                         ActionsBeliefsActionsTask,
                     ]
@@ -99,7 +133,7 @@ def generate_sally_anne_tasks(world_paths,
                         f.write(story)
 
                     # AB + BA
-                    filename = 'qa4_task_AB_BA_train.txt'
+                    filename = 'qa24_task_AB_BA_train.txt'
                     tasks = [
                         ActionsBeliefsTask,
                         BeliefsActionsTask,
@@ -119,7 +153,7 @@ def generate_sally_anne_tasks(world_paths,
                         f.write(story)
 
                     # AB + BA + ABA
-                    filename = 'qa5_task_AB_BA_ABA_train.txt'
+                    filename = 'qa25_task_AB_BA_ABA_train.txt'
                     tasks = [
                         ActionsBeliefsTask,
                         BeliefsActionsTask,
@@ -139,31 +173,6 @@ def generate_sally_anne_tasks(world_paths,
                     with open(os.path.join(output_dir_path, folder_name, filename), 'w') as f:
                         f.write(story)
 
-                    # Test
-                    tasks = [
-                        ActionsBeliefsActionsTask,
-                    ]
-                    story = []
-
-                    i = 0
-                    while i < num_stories:
-                        task = np.random.choice(tasks)
-                        story.extend(
-                            stringify(task(exit_prob=1.).generate_story(w, None))
-                        )
-                        i += 1 * num_questions
-                    story = '\n'.join(story)
-
-                    test_filenames = [
-                        'qa1_task_AB_test.txt',
-                        'qa2_task_BA_test.txt',
-                        'qa3_task_ABA_test.txt',
-                        'qa4_task_AB_BA_test.txt',
-                        'qa5_task_AB_BA_ABA_test.txt',
-                    ]
-                    for fname in test_filenames:
-                        with open(os.path.join(output_dir_path, folder_name, fname), 'w') as f:
-                            f.write(story)
 
 def parse_args(args):
 
@@ -176,6 +185,10 @@ def parse_args(args):
     parser.add_argument('-o', '--output_dir_path', dest='output_dir_path', type=mkdir_p,
                         default='data',
                         help='Output directory path')
+
+    parser.add_argument('-b', '--babi_dir_path', dest='babi_dir_path', type=str,
+                        required=True,
+                        help='Path to directory containing the 20 bAbi task training and test data')
 
     parser.add_argument('-l', '--logging', type=str, default='INFO', metavar='logging',
                         choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'],
@@ -213,6 +226,7 @@ def main(args=sys.argv[1:]):
     if args.sally_anne is True:
         generate_sally_anne_tasks(args.world_paths,
                                   os.path.join(args.output_dir_path, 'sally_anne'),
+                                  args.babi_dir_path,
                                   args.num_stories_choices,
                                   args.search_prob_choices,
                                   args.exit_prob_choices,
