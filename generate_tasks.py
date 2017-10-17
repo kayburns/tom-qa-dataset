@@ -22,6 +22,8 @@ def generate_sally_anne_tasks(world_paths,
                               num_stories_choices,
                               exit_prob_choices,
                               search_prob_choices,
+                              informant_prob_choices,
+                              theory_of_mind_test_prob_choices,
                               num_questions=5,
                              ):
 
@@ -59,119 +61,121 @@ def generate_sally_anne_tasks(world_paths,
         for num_stories in num_stories_choices:
             for exit_prob in exit_prob_choices:
                 for search_prob in search_prob_choices:
+                    for informant_prob in informant_prob_choices:
+                        for theory_of_mind_test_prob in theory_of_mind_test_prob_choices:
 
-                    folder_name = '%s_nex_%d_exitp_%.2f_searchp_%.2f' % (world_name, num_stories, exit_prob, search_prob)
-                    logging.info("Creating Sally-Anne task in %s..." % folder_name)
-                    mkdir_p(os.path.join(output_dir_path, folder_name))
+                            folder_name = '%s_nex_%d_exitp_%.2f_searchp_%.2f_informp_%.2f_tomp_%.2f' % (world_name, num_stories, exit_prob, search_prob, informant_prob, theory_of_mind_test_prob)
+                            logging.info("Creating Sally-Anne task in %s..." % folder_name)
+                            mkdir_p(os.path.join(output_dir_path, folder_name))
 
-                    # Symlink the bAbi data
-                    babi_subdir = 'en' if num_stories < 5000 else 'en-10k'
-                    for filepath in glob.glob(os.path.join(babi_dir_path, babi_subdir, '*train.txt')):
-                        os.symlink(filepath, os.path.join(output_dir_path, folder_name, os.path.basename(filepath)))
+                            ## Symlink the bAbi data
+                            #babi_subdir = 'en' if num_stories < 5000 else 'en-10k'
+                            #for filepath in glob.glob(os.path.join(babi_dir_path, babi_subdir, '*train.txt')):
+                            #    os.symlink(filepath, os.path.join(output_dir_path, folder_name, os.path.basename(filepath)))
 
-                    # Write test
-                    with open(os.path.join(output_dir_path, folder_name, 'true_belief_task_test.txt'), 'w') as f:
-                        f.write('\n'.join(true_belief_test_story[:int(num_stories / num_questions)]))
-                    with open(os.path.join(output_dir_path, folder_name, 'false_belief_task_test.txt'), 'w') as f:
-                        f.write('\n'.join(false_belief_test_story[:int(num_stories / num_questions)]))
+                            # Write test
+                            with open(os.path.join(output_dir_path, folder_name, 'true_belief_task_test.txt'), 'w') as f:
+                                f.write('\n'.join(true_belief_test_story[:int(num_stories / num_questions)]))
+                            with open(os.path.join(output_dir_path, folder_name, 'false_belief_task_test.txt'), 'w') as f:
+                                f.write('\n'.join(false_belief_test_story[:int(num_stories / num_questions)]))
 
-                    # AB
-                    filename = 'qa21_task_AB_train.txt'
-                    tasks = [
-                        ActionsBeliefsTask,
-                    ]
-                    story = []
+                            # AB
+                            filename = 'qa21_task_AB_train.txt'
+                            tasks = [
+                                ActionsBeliefsTask,
+                            ]
+                            story = []
 
-                    i = 0
-                    while i < num_stories:
-                        task = np.random.choice(tasks)
-                        story.extend(
-                            stringify(task(exit_prob=exit_prob, search_prob=search_prob).generate_story(w, None))
-                        )
-                        i += 1 * num_questions
-                    story = '\n'.join(story)
+                            i = 0
+                            while i < num_stories:
+                                task = np.random.choice(tasks)
+                                story.extend(
+                                    stringify(task(exit_prob=exit_prob, informant_prob=informant_prob, search_prob=search_prob, theory_of_mind_test_prob=theory_of_mind_test_prob).generate_story(w, None))
+                                )
+                                i += 1 * num_questions
+                            story = '\n'.join(story)
 
-                    with open(os.path.join(output_dir_path, folder_name, filename), 'w') as f:
-                        f.write(story)
+                            with open(os.path.join(output_dir_path, folder_name, filename), 'w') as f:
+                                f.write(story)
 
-                    # BA
-                    filename = 'qa22_task_BA_train.txt'
-                    tasks = [
-                        BeliefsActionsTask,
-                    ]
-                    story = []
+                            # BA
+                            filename = 'qa22_task_BA_train.txt'
+                            tasks = [
+                                BeliefsActionsTask,
+                            ]
+                            story = []
 
-                    i = 0
-                    while i < num_stories:
-                        task = np.random.choice(tasks)
-                        story.extend(
-                            stringify(task(exit_prob=exit_prob, search_prob=search_prob).generate_story(w, None))
-                        )
-                        i += 1 * num_questions
-                    story = '\n'.join(story)
+                            i = 0
+                            while i < num_stories:
+                                task = np.random.choice(tasks)
+                                story.extend(
+                                    stringify(task(exit_prob=exit_prob, informant_prob=informant_prob, search_prob=search_prob, theory_of_mind_test_prob=theory_of_mind_test_prob).generate_story(w, None))
+                                )
+                                i += 1 * num_questions
+                            story = '\n'.join(story)
 
-                    with open(os.path.join(output_dir_path, folder_name, filename), 'w') as f:
-                        f.write(story)
+                            with open(os.path.join(output_dir_path, folder_name, filename), 'w') as f:
+                                f.write(story)
 
-                    # ABA
-                    filename = 'qa23_task_ABA_train.txt'
-                    tasks = [
-                        ActionsBeliefsActionsTask,
-                    ]
-                    story = []
+                            # ABA
+                            filename = 'qa23_task_ABA_train.txt'
+                            tasks = [
+                                ActionsBeliefsActionsTask,
+                            ]
+                            story = []
 
-                    i = 0
-                    while i < num_stories:
-                        task = np.random.choice(tasks)
-                        story.extend(
-                            stringify(task(exit_prob=exit_prob, search_prob=search_prob).generate_story(w, None))
-                        )
-                        i += 1 * num_questions
-                    story = '\n'.join(story)
+                            i = 0
+                            while i < num_stories:
+                                task = np.random.choice(tasks)
+                                story.extend(
+                                    stringify(task(exit_prob=exit_prob, informant_prob=informant_prob, search_prob=search_prob, theory_of_mind_test_prob=theory_of_mind_test_prob).generate_story(w, None))
+                                )
+                                i += 1 * num_questions
+                            story = '\n'.join(story)
 
-                    with open(os.path.join(output_dir_path, folder_name, filename), 'w') as f:
-                        f.write(story)
+                            with open(os.path.join(output_dir_path, folder_name, filename), 'w') as f:
+                                f.write(story)
 
-                    # AB + BA
-                    filename = 'qa24_task_AB_BA_train.txt'
-                    tasks = [
-                        ActionsBeliefsTask,
-                        BeliefsActionsTask,
-                    ]
-                    story = []
+                            # AB + BA
+                            filename = 'qa24_task_AB_BA_train.txt'
+                            tasks = [
+                                ActionsBeliefsTask,
+                                BeliefsActionsTask,
+                            ]
+                            story = []
 
-                    i = 0
-                    while i < num_stories:
-                        task = np.random.choice(tasks)
-                        story.extend(
-                            stringify(task(exit_prob=exit_prob, search_prob=search_prob).generate_story(w, None))
-                        )
-                        i += 1 * num_questions
-                    story = '\n'.join(story)
+                            i = 0
+                            while i < num_stories:
+                                task = np.random.choice(tasks)
+                                story.extend(
+                                    stringify(task(exit_prob=exit_prob, informant_prob=informant_prob, search_prob=search_prob, theory_of_mind_test_prob=theory_of_mind_test_prob).generate_story(w, None))
+                                )
+                                i += 1 * num_questions
+                            story = '\n'.join(story)
 
-                    with open(os.path.join(output_dir_path, folder_name, filename), 'w') as f:
-                        f.write(story)
+                            with open(os.path.join(output_dir_path, folder_name, filename), 'w') as f:
+                                f.write(story)
 
-                    # AB + BA + ABA
-                    filename = 'qa25_task_AB_BA_ABA_train.txt'
-                    tasks = [
-                        ActionsBeliefsTask,
-                        BeliefsActionsTask,
-                        ActionsBeliefsActionsTask,
-                    ]
-                    story = []
+                            # AB + BA + ABA
+                            filename = 'qa25_task_AB_BA_ABA_train.txt'
+                            tasks = [
+                                ActionsBeliefsTask,
+                                BeliefsActionsTask,
+                                ActionsBeliefsActionsTask,
+                            ]
+                            story = []
 
-                    i = 0
-                    while i < num_stories:
-                        task = np.random.choice(tasks)
-                        story.extend(
-                            stringify(task(exit_prob=exit_prob, search_prob=search_prob).generate_story(w, None))
-                        )
-                        i += 1 * num_questions
-                    story = '\n'.join(story)
+                            i = 0
+                            while i < num_stories:
+                                task = np.random.choice(tasks)
+                                story.extend(
+                                    stringify(task(exit_prob=exit_prob, informant_prob=informant_prob, search_prob=search_prob, theory_of_mind_test_prob=theory_of_mind_test_prob).generate_story(w, None))
+                                )
+                                i += 1 * num_questions
+                            story = '\n'.join(story)
 
-                    with open(os.path.join(output_dir_path, folder_name, filename), 'w') as f:
-                        f.write(story)
+                            with open(os.path.join(output_dir_path, folder_name, filename), 'w') as f:
+                                f.write(story)
 
 
 def parse_args(args):
@@ -210,6 +214,14 @@ def parse_args(args):
                         action='append',
                         help='Probability that an exit will occur in Sally-Anne training tasks, all types')
 
+    parser.add_argument('-pi', '--prob_informant', dest='informant_prob_choices', type=float,
+                        action='append',
+                        help='')
+
+    parser.add_argument('-pt', '--prob_theory_of_mind_test', dest='theory_of_mind_test_prob_choices', type=float,
+                        action='append',
+                        help='')
+
     parsed = parser.parse_args(args)
 
     if parsed.sally_anne is True and parsed.search_prob_choices is None or parsed.exit_prob_choices is None:
@@ -230,7 +242,10 @@ def main(args=sys.argv[1:]):
                                   num_stories_choices=args.num_stories_choices,
                                   exit_prob_choices=args.exit_prob_choices,
                                   search_prob_choices=args.search_prob_choices,
+                                  informant_prob_choices=args.informant_prob_choices,
+                                  theory_of_mind_test_prob_choices=args.theory_of_mind_test_prob_choices,
                                  )
+
 
 
 if __name__ == "__main__":

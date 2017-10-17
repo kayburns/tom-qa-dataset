@@ -97,3 +97,43 @@ class BelieveLocationAction(Action):
             ],
         }
         super().__init__(templates)
+
+
+class BelieveAgentBelieveLocationAction(Action):
+
+    def __init__(self):
+        templates = {
+            'interrogative': [
+                'Where does %s think that %s believes the %s is?\t%s',
+                'Where does %s believe that %s believes the %s is?\t%s',
+                'Where does %s think that %s thinks the %s is?\t%s',
+                'Where does %s believe that %s thinks the %s is?\t%s',
+            ],
+        }
+        super().__init__(templates)
+
+
+class BelieveAgentSearchLocationAction(Action):
+
+    def __init__(self):
+        templates = {
+            'interrogative': [
+                'Where does %s think that %s looks for the %s?\t%s',
+                'Where does %s believe that %s looks for the %s?\t%s',
+                'Where does %s think that %s searches for the %s?\t%s',
+                'Where does %s believe that %s search for the %s?\t%s',
+            ],
+        }
+        super().__init__(templates)
+
+
+class InformLocationAction(Action):
+
+    def __init__(self):
+        templates = {
+            'declarative': [
+                '%s told %s that the %s is in the %s.',
+                '%s informed %s that the %s is in the %s.',
+            ],
+        }
+        super().__init__(templates)
