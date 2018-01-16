@@ -40,21 +40,111 @@ def generate_sally_anne_tasks(world_paths,
             ActionsBeliefsActionsTask,
         ]
 
-        true_belief_test_story = []
+        true_belief_test_story_firstord = []
         i = 0
         while i < np.max(num_stories_choices):
             task = np.random.choice(tasks)
-            true_belief_test_story.append(
-                '\n'.join(stringify(task(exit_prob=0.).generate_story(w, None)))
+            true_belief_test_story_firstord.append(
+                '\n'.join(stringify(task(exit_prob=0., test_cond='first order').generate_story(w, None)))
             )
             i += 1 * num_questions
 
-        false_belief_test_story = []
+        false_belief_test_story_firstord = []
         i = 0
         while i < np.max(num_stories_choices):
             task = np.random.choice(tasks)
-            false_belief_test_story.append(
-                '\n'.join(stringify(task(exit_prob=1.).generate_story(w, None)))
+            false_belief_test_story_firstord.append(
+                '\n'.join(stringify(task(exit_prob=1., informant_prob=0., test_cond='first order').generate_story(w, None)))
+            )
+            i += 1 * num_questions
+
+        false_false_belief_test_story_firstord = []
+        i = 0
+        while i < np.max(num_stories_choices):
+            task = np.random.choice(tasks)
+            false_false_belief_test_story_firstord.append(
+                '\n'.join(stringify(task(exit_prob=1., informant_prob=1., test_cond='first order').generate_story(w, None)))
+            )
+            i += 1 * num_questions
+
+        true_belief_test_story_secondord = []
+        i = 0
+        while i < np.max(num_stories_choices):
+            task = np.random.choice(tasks)
+            true_belief_test_story_secondord.append(
+                '\n'.join(stringify(task(exit_prob=0., test_cond='second order').generate_story(w, None)))
+            )
+            i += 1 * num_questions
+
+        false_belief_test_story_secondord = []
+        i = 0
+        while i < np.max(num_stories_choices):
+            task = np.random.choice(tasks)
+            false_belief_test_story_secondord.append(
+                '\n'.join(stringify(task(exit_prob=1., informant_prob=0., test_cond='second order').generate_story(w, None)))
+            )
+            i += 1 * num_questions
+
+        false_false_belief_test_story_secondord = []
+        i = 0
+        while i < np.max(num_stories_choices):
+            task = np.random.choice(tasks)
+            false_false_belief_test_story_secondord.append(
+                '\n'.join(stringify(task(exit_prob=1., informant_prob=1., test_cond='second order').generate_story(w, None)))
+            )
+            i += 1 * num_questions
+
+        true_belief_test_story_reality = []
+        i = 0
+        while i < np.max(num_stories_choices):
+            task = np.random.choice(tasks)
+            true_belief_test_story_reality.append(
+                '\n'.join(stringify(task(exit_prob=0., test_cond='reality').generate_story(w, None)))
+            )
+            i += 1 * num_questions
+
+        false_belief_test_story_reality = []
+        i = 0
+        while i < np.max(num_stories_choices):
+            task = np.random.choice(tasks)
+            false_belief_test_story_reality.append(
+                '\n'.join(stringify(task(exit_prob=1., informant_prob=0., test_cond='reality').generate_story(w, None)))
+            )
+            i += 1 * num_questions
+
+        false_false_belief_test_story_reality = []
+        i = 0
+        while i < np.max(num_stories_choices):
+            task = np.random.choice(tasks)
+            false_false_belief_test_story_reality.append(
+                '\n'.join(stringify(task(exit_prob=1., informant_prob=1., test_cond='reality').generate_story(w, None)))
+            )
+            i += 1 * num_questions
+
+        true_belief_test_story_memory = []
+        i = 0
+        while i < np.max(num_stories_choices):
+            task = np.random.choice(tasks)
+            true_belief_test_story_memory.append(
+                '\n'.join(stringify(task(exit_prob=0., test_cond='memory').generate_story(w, None)))
+            )
+            i += 1 * num_questions
+
+        false_belief_test_story_memory = []
+        i = 0
+        while i < np.max(num_stories_choices):
+            task = np.random.choice(tasks)
+            false_belief_test_story_memory.append(
+                '\n'.join(stringify(task(exit_prob=1., informant_prob=0., test_cond='memory').generate_story(w, None)))
+            )
+            i += 1 * num_questions
+
+        false_false_belief_test_story_memory = []
+        i = 0
+        while i < np.max(num_stories_choices):
+            task = np.random.choice(tasks)
+            false_false_belief_test_story_memory.append(
+                '\n'.join(stringify(task(exit_prob=1., informant_prob=1., test_cond='memory').generate_story(w, None)))
             )
             i += 1 * num_questions
 
@@ -62,9 +152,11 @@ def generate_sally_anne_tasks(world_paths,
             for exit_prob in exit_prob_choices:
                 for search_prob in search_prob_choices:
                     for informant_prob in informant_prob_choices:
-                        for theory_of_mind_test_prob in theory_of_mind_test_prob_choices:
+                        #for theory_of_mind_test_prob in theory_of_mind_test_prob_choices:
+                        if True:
 
-                            folder_name = '%s_nex_%d_exitp_%.2f_searchp_%.2f_informp_%.2f_tomp_%.2f' % (world_name, num_stories, exit_prob, search_prob, informant_prob, theory_of_mind_test_prob)
+                            #folder_name = '%s_nex_%d_exitp_%.2f_searchp_%.2f_informp_%.2f_tomp_%.2f' % (world_name, num_stories, exit_prob, search_prob, informant_prob, theory_of_mind_test_prob)
+                            folder_name = '%s_nex_%d_exitp_%.2f_searchp_%.2f_informp_%.2f' % (world_name, num_stories, exit_prob, search_prob, informant_prob)
                             logging.info("Creating Sally-Anne task in %s..." % folder_name)
                             mkdir_p(os.path.join(output_dir_path, folder_name))
 
@@ -74,10 +166,36 @@ def generate_sally_anne_tasks(world_paths,
                             #    os.symlink(filepath, os.path.join(output_dir_path, folder_name, os.path.basename(filepath)))
 
                             # Write test
-                            with open(os.path.join(output_dir_path, folder_name, 'true_belief_task_test.txt'), 'w') as f:
-                                f.write('\n'.join(true_belief_test_story[:int(num_stories / num_questions)]))
-                            with open(os.path.join(output_dir_path, folder_name, 'false_belief_task_test.txt'), 'w') as f:
-                                f.write('\n'.join(false_belief_test_story[:int(num_stories / num_questions)]))
+                            with open(os.path.join(output_dir_path, folder_name, 'true_belief_task_firstord_test.txt'), 'w') as f:
+                                f.write('\n'.join(true_belief_test_story_firstord[:int(num_stories / num_questions)]))
+                            with open(os.path.join(output_dir_path, folder_name, 'false_belief_task_firstord_test.txt'), 'w') as f:
+                                f.write('\n'.join(false_belief_test_story_firstord[:int(num_stories / num_questions)]))
+                            with open(os.path.join(output_dir_path, folder_name, 'false_false_belief_task_firstord_test.txt'), 'w') as f:
+                                f.write('\n'.join(false_false_belief_test_story_firstord[:int(num_stories / num_questions)]))
+
+
+                            with open(os.path.join(output_dir_path, folder_name, 'true_belief_task_secondord_test.txt'), 'w') as f:
+                                f.write('\n'.join(true_belief_test_story_secondord[:int(num_stories / num_questions)]))
+                            with open(os.path.join(output_dir_path, folder_name, 'false_belief_task_secondord_test.txt'), 'w') as f:
+                                f.write('\n'.join(false_belief_test_story_secondord[:int(num_stories / num_questions)]))
+                            with open(os.path.join(output_dir_path, folder_name, 'false_false_belief_task_secondord_test.txt'), 'w') as f:
+                                f.write('\n'.join(false_false_belief_test_story_secondord[:int(num_stories / num_questions)]))
+
+                            with open(os.path.join(output_dir_path, folder_name, 'true_belief_task_reality_test.txt'), 'w') as f:
+                                f.write('\n'.join(true_belief_test_story_reality[:int(num_stories / num_questions)]))
+                            with open(os.path.join(output_dir_path, folder_name, 'false_belief_task_reality_test.txt'), 'w') as f:
+                                f.write('\n'.join(false_belief_test_story_reality[:int(num_stories / num_questions)]))
+                            with open(os.path.join(output_dir_path, folder_name, 'false_false_belief_task_reality_test.txt'), 'w') as f:
+                                f.write('\n'.join(false_false_belief_test_story_reality[:int(num_stories / num_questions)]))
+
+                            with open(os.path.join(output_dir_path, folder_name, 'true_belief_task_memory_test.txt'), 'w') as f:
+                                f.write('\n'.join(true_belief_test_story_memory[:int(num_stories / num_questions)]))
+                            with open(os.path.join(output_dir_path, folder_name, 'false_belief_task_memory_test.txt'), 'w') as f:
+                                f.write('\n'.join(false_belief_test_story_memory[:int(num_stories / num_questions)]))
+                            with open(os.path.join(output_dir_path, folder_name, 'false_false_belief_task_memory_test.txt'), 'w') as f:
+                                f.write('\n'.join(false_false_belief_test_story_memory[:int(num_stories / num_questions)]))
+
+                            test_conds = ['first order', 'second order', 'reality', 'memory']
 
                             # AB
                             filename = 'qa21_task_AB_train.txt'
@@ -89,9 +207,10 @@ def generate_sally_anne_tasks(world_paths,
                             i = 0
                             while i < num_stories:
                                 task = np.random.choice(tasks)
-                                story.extend(
-                                    stringify(task(exit_prob=exit_prob, informant_prob=informant_prob, search_prob=search_prob, theory_of_mind_test_prob=theory_of_mind_test_prob).generate_story(w, None))
-                                )
+                                for test_cond in test_conds:
+                                    story.extend(
+                                        stringify(task(exit_prob=exit_prob, informant_prob=informant_prob, search_prob=search_prob, test_cond=test_cond).generate_story(w, None))
+                                    )
                                 i += 1 * num_questions
                             story = '\n'.join(story)
 
@@ -108,9 +227,10 @@ def generate_sally_anne_tasks(world_paths,
                             i = 0
                             while i < num_stories:
                                 task = np.random.choice(tasks)
-                                story.extend(
-                                    stringify(task(exit_prob=exit_prob, informant_prob=informant_prob, search_prob=search_prob, theory_of_mind_test_prob=theory_of_mind_test_prob).generate_story(w, None))
-                                )
+                                for test_cond in test_conds:
+                                    story.extend(
+                                        stringify(task(exit_prob=exit_prob, informant_prob=informant_prob, search_prob=search_prob, test_cond=test_cond).generate_story(w, None))
+                                    )
                                 i += 1 * num_questions
                             story = '\n'.join(story)
 
@@ -127,9 +247,10 @@ def generate_sally_anne_tasks(world_paths,
                             i = 0
                             while i < num_stories:
                                 task = np.random.choice(tasks)
-                                story.extend(
-                                    stringify(task(exit_prob=exit_prob, informant_prob=informant_prob, search_prob=search_prob, theory_of_mind_test_prob=theory_of_mind_test_prob).generate_story(w, None))
-                                )
+                                for test_cond in test_conds:
+                                    story.extend(
+                                        stringify(task(exit_prob=exit_prob, informant_prob=informant_prob, search_prob=search_prob, test_cond=test_cond).generate_story(w, None))
+                                    )
                                 i += 1 * num_questions
                             story = '\n'.join(story)
 
@@ -147,9 +268,10 @@ def generate_sally_anne_tasks(world_paths,
                             i = 0
                             while i < num_stories:
                                 task = np.random.choice(tasks)
-                                story.extend(
-                                    stringify(task(exit_prob=exit_prob, informant_prob=informant_prob, search_prob=search_prob, theory_of_mind_test_prob=theory_of_mind_test_prob).generate_story(w, None))
-                                )
+                                for test_cond in test_conds:
+                                    story.extend(
+                                        stringify(task(exit_prob=exit_prob, informant_prob=informant_prob, search_prob=search_prob, test_cond=test_cond).generate_story(w, None))
+                                    )
                                 i += 1 * num_questions
                             story = '\n'.join(story)
 
@@ -168,9 +290,10 @@ def generate_sally_anne_tasks(world_paths,
                             i = 0
                             while i < num_stories:
                                 task = np.random.choice(tasks)
-                                story.extend(
-                                    stringify(task(exit_prob=exit_prob, informant_prob=informant_prob, search_prob=search_prob, theory_of_mind_test_prob=theory_of_mind_test_prob).generate_story(w, None))
-                                )
+                                for test_cond in test_conds:
+                                    story.extend(
+                                        stringify(task(exit_prob=exit_prob, informant_prob=informant_prob, search_prob=search_prob, test_cond=test_cond).generate_story(w, None))
+                                    )
                                 i += 1 * num_questions
                             story = '\n'.join(story)
 

@@ -11,8 +11,32 @@ class Action(object):
         return np.random.choice(self.templates['declarative']) % args
 
     def render_interrogative(self, *args):
-        assert 'interrogative' in self.templates and len(self.templates['interrogative']) > 0
+        assert 'interrogative' in self.templates and len(self.templates['interrogative']) > 0, str(self.templates)
         return np.random.choice(self.templates['interrogative']) % args
+
+
+class ExistBeginning(Action):
+
+    def __init__(self):
+        templates = {
+            'interrogative': [
+                'Where was the %s at the beginning?\t%s',
+                'Where was the %s before?\t%s',
+            ]
+        }
+        super().__init__(templates)
+
+
+class Exist(Action):
+
+    def __init__(self):
+        templates = {
+            'interrogative': [
+                'Where is the %s?\t%s',
+                'Where is the %s located?\t%s',
+            ]
+        }
+        super().__init__(templates)
 
 
 class PlaceAction(Action):

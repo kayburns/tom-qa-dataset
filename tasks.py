@@ -7,10 +7,11 @@ from actions import *
 
 class Task(object):
 
-    def __init__(self, num_questions=5, exit_prob=1., informant_prob=1., search_prob=1., theory_of_mind_test_prob=1.):
+    def __init__(self, num_questions=5, exit_prob=1., informant_prob=1., search_prob=1., test_cond='first order'):
         self.search_prob = search_prob
         self.exit_inform_probs = [1 - exit_prob, exit_prob*(1 - informant_prob), exit_prob*informant_prob]
-        self.theory_of_mind_test_prob = theory_of_mind_test_prob
+        #self.theory_of_mind_test_prob = theory_of_mind_test_prob
+        self.test_cond = test_cond
         assert sum(self.exit_inform_probs) == 1
         self.num_questions = num_questions
 
@@ -47,7 +48,8 @@ class ActionsBeliefsTask(Task):
             do_search = np.random.choice([True, False], p=[self.search_prob, 1 - self.search_prob])
 
             # Whether to test for theory of mind
-            theory_of_mind_test = np.random.choice([True, False], p=[self.theory_of_mind_test_prob, 1 - self.theory_of_mind_test_prob])
+            #theory_of_mind_test = np.random.choice([True, False], p=[self.theory_of_mind_test_prob, 1 - self.theory_of_mind_test_prob])
+            test_cond = self.test_cond
 
             if do_search:
                 random_containers = np.random.choice(containers, size=3, replace=False)
@@ -124,7 +126,7 @@ class ActionsBeliefsTask(Task):
                     Clause(
                         world,
                         True,
-                        [1] if exit_enter in [1, 2] else [1, 2],
+                        [2],
                         random_actors[2],
                         InformLocationAction(),
                         random_actors[0],
@@ -153,7 +155,7 @@ class ActionsBeliefsTask(Task):
                 pass
             story.extend(clauses)
 
-            if theory_of_mind_test is False:
+            if test_cond == 'first order':
 
                 believe_loc = random_containers[0] if exit_enter == 1 else random_containers[1]
 
@@ -168,7 +170,7 @@ class ActionsBeliefsTask(Task):
                     )
                 )
 
-            else:
+            elif test_cond == 'second order':
 
                 believe_loc = random_containers[1] if exit_enter == 0 else random_containers[0]
 
@@ -183,6 +185,37 @@ class ActionsBeliefsTask(Task):
                         believe_loc,
                     )
                 )
+
+            elif test_cond == 'reality':
+
+                loc = random_containers[1]
+
+                # question: where does person B think that A will search for the item?
+                story.append(
+                    Question(
+                        idx_support,
+                        random_object,
+                        Exist(),
+                        loc,
+                    )
+                )
+
+            elif test_cond == 'memory':
+
+                loc = random_containers[0]
+
+                # question: where does person B think that A will search for the item?
+                story.append(
+                    Question(
+                        idx_support,
+                        random_object,
+                        ExistBeginning(),
+                        loc,
+                    )
+                )
+
+            else:
+                raise NotImplementedError
 
             num_questions += 1
 
@@ -216,7 +249,8 @@ class BeliefsActionsTask(Task):
             exit_enter = np.random.choice([0, 1, 2], p=self.exit_inform_probs)
 
             # Whether to test for theory of mind
-            theory_of_mind_test = np.random.choice([True, False], p=[self.theory_of_mind_test_prob, 1 - self.theory_of_mind_test_prob])
+            #theory_of_mind_test = np.random.choice([True, False], p=[self.theory_of_mind_test_prob, 1 - self.theory_of_mind_test_prob])
+            test_cond = self.test_cond
 
             if exit_enter == 1 or exit_enter == 2:
 
@@ -269,7 +303,7 @@ class BeliefsActionsTask(Task):
                     Clause(
                         world,
                         True,
-                        [1] if exit_enter in [1, 2] else [1, 2],
+                        [2],
                         random_actors[2],
                         InformLocationAction(),
                         random_actors[0],
@@ -317,26 +351,27 @@ class BeliefsActionsTask(Task):
             story.extend(clauses)
 
             # Clause: where does person A seach for the item?
-            if theory_of_mind_test is False:
+            #if not theory_of_mind_test:
+            if test_cond == 'first order':
 
                believe_loc = random_containers[0] if exit_enter == 1 else random_containers[1]
 
-               # question: where does person A believe is the item?
+               # question: where does person A search for the item?
                story.append(
                    Question(
                        idx_support,
                        random_actors[0],
-                       BelieveLocationAction(),
+                       SearchAction(),
                        random_object,
                        believe_loc,
                    )
                )
 
-            else:
+            elif test_cond == 'second order':
 
                 believe_loc = random_containers[1] if exit_enter == 0 else random_containers[0]
 
-                # question: where does person B think that A believes the item is?
+                # question: where does person B think that A will search for the item?
                 story.append(
                     Question(
                         idx_support,
@@ -347,6 +382,37 @@ class BeliefsActionsTask(Task):
                         believe_loc,
                     )
                 )
+
+            elif test_cond == 'reality':
+
+                loc = random_containers[1]
+
+                # question: where does person B think that A will search for the item?
+                story.append(
+                    Question(
+                        idx_support,
+                        random_object,
+                        Exist(),
+                        loc,
+                    )
+                )
+
+            elif test_cond == 'memory':
+
+                loc = random_containers[0]
+
+                # question: where does person B think that A will search for the item?
+                story.append(
+                    Question(
+                        idx_support,
+                        random_object,
+                        ExistBeginning(),
+                        loc,
+                    )
+                )
+
+            else:
+                raise NotImplementedError
 
             num_questions += 1
 
@@ -380,7 +446,8 @@ class ActionsBeliefsActionsTask(Task):
             exit_enter = np.random.choice([0, 1, 2], p=self.exit_inform_probs)
 
             # Whether to test for theory of mind
-            theory_of_mind_test = np.random.choice([True, False], p=[self.theory_of_mind_test_prob, 1 - self.theory_of_mind_test_prob])
+            #theory_of_mind_test = np.random.choice([True, False], p=[self.theory_of_mind_test_prob, 1 - self.theory_of_mind_test_prob])
+            test_cond = self.test_cond
 
             # person A drops the item in container X
             clauses.append(
@@ -431,7 +498,7 @@ class ActionsBeliefsActionsTask(Task):
                     Clause(
                         world,
                         True,
-                        [1] if exit_enter in [1, 2] else [1, 2],
+                        [2],
                         random_actors[2],
                         InformLocationAction(),
                         random_actors[0],
@@ -466,22 +533,22 @@ class ActionsBeliefsActionsTask(Task):
             story.extend(clauses)
 
             # Question
-            if theory_of_mind_test is False:
+            if test_cond == 'first order':
 
                believe_loc = random_containers[0] if exit_enter == 1 else random_containers[1]
 
-               # question: where does person A believe is the item?
+               # question: where does person A search for the item?
                story.append(
                    Question(
                        idx_support,
                        random_actors[0],
-                       BelieveLocationAction(),
+                       SearchAction(),
                        random_object,
                        believe_loc,
                    )
                )
 
-            else:
+            elif test_cond == 'second order':
 
                 believe_loc = random_containers[1] if exit_enter == 0 else random_containers[0]
 
@@ -496,6 +563,37 @@ class ActionsBeliefsActionsTask(Task):
                         believe_loc,
                     )
                 )
+
+            elif test_cond == 'reality':
+
+                loc = random_containers[1]
+
+                # question: where does person B think that A will search for the item?
+                story.append(
+                    Question(
+                        idx_support,
+                        random_object,
+                        Exist(),
+                        loc,
+                    )
+                )
+
+            elif test_cond == 'memory':
+
+                loc = random_containers[0]
+
+                # question: where does person B think that A will search for the item?
+                story.append(
+                    Question(
+                        idx_support,
+                        random_object,
+                        ExistBeginning(),
+                        loc,
+                    )
+                )
+
+            else:
+                raise NotImplementedError
 
             num_questions += 1
 
