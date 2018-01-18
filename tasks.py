@@ -166,8 +166,8 @@ class ActionsBeliefsTask(Task):
                 story.append(
                     Question(
                         idx_support,
-                        random_actors[0],
                         BelieveLocationAction(),
+                        random_actors[0],
                         random_object,
                         believe_loc,
                     )
@@ -183,8 +183,8 @@ class ActionsBeliefsTask(Task):
                 story.append(
                     Question(
                         idx_support,
-                        random_actors[1],
                         BelieveAgentBelieveLocationAction(),
+                        random_actors[1],
                         random_actors[0],
                         random_object,
                         believe_loc,
@@ -199,8 +199,8 @@ class ActionsBeliefsTask(Task):
                 story.append(
                     Question(
                         idx_support,
-                        random_object,
                         Exist(),
+                        random_object,
                         loc,
                     )
                 )
@@ -213,8 +213,8 @@ class ActionsBeliefsTask(Task):
                 story.append(
                     Question(
                         idx_support,
-                        random_object,
                         ExistBeginning(),
+                        random_object,
                         loc,
                     )
                 )
@@ -348,8 +348,8 @@ class BeliefsActionsTask(Task):
                 story.append(
                     Question(
                         idx_support,
-                        random_actors[0],
                         SearchAction(),
+                        random_actors[0],
                         random_object,
                         believe_loc,
                     )
@@ -365,8 +365,8 @@ class BeliefsActionsTask(Task):
                 story.append(
                     Question(
                         idx_support,
-                        random_actors[1],
                         BelieveAgentSearchLocationAction(),
+                        random_actors[1],
                         random_actors[0],
                         random_object,
                         believe_loc,
@@ -381,8 +381,8 @@ class BeliefsActionsTask(Task):
                 story.append(
                     Question(
                         idx_support,
-                        random_object,
                         Exist(),
+                        random_object,
                         loc,
                     )
                 )
@@ -395,8 +395,8 @@ class BeliefsActionsTask(Task):
                 story.append(
                     Question(
                         idx_support,
-                        random_object,
                         ExistBeginning(),
+                        random_object,
                         loc,
                     )
                 )
@@ -439,11 +439,9 @@ class ActionsBeliefsActionsTask(Task):
             # Person A drops the item in container X
             clauses.append(
                 Clause(
-                    world,
-                    True,
                     [1, 2],
-                    random_actors[0],
                     PlaceAction(),
+                    random_actors[0],
                     random_object,
                     random_containers[0]
                 )
@@ -457,11 +455,9 @@ class ActionsBeliefsActionsTask(Task):
                 # person A exits the location
                 clauses.append(
                     Clause(
-                        world,
-                        True,
                         [1, 2],
-                        random_actors[0],
                         ExitAction(),
+                        random_actors[0],
                         random_location
                     )
                 )
@@ -469,11 +465,9 @@ class ActionsBeliefsActionsTask(Task):
             # Person B moves the item from container X to container Y
             clauses.append(
                 Clause(
-                    world,
-                    True,
                     [1] if exit_enter in [1, 2] else [1, 2],
-                    random_actors[1],
                     TransportAction(),
+                    random_actors[1],
                     random_object,
                     random_containers[0],
                     random_containers[1]
@@ -485,11 +479,9 @@ class ActionsBeliefsActionsTask(Task):
                 # Person A is informed
                 clauses.append(
                     Clause(
-                        world,
-                        True,
                         [2],
-                        random_actors[2],
                         InformLocationAction(),
+                        random_actors[2],
                         random_actors[0],
                         random_object,
                         random_containers[1]
@@ -501,11 +493,9 @@ class ActionsBeliefsActionsTask(Task):
                 # Person A re-enters the location
                 clauses.append(
                     Clause(
-                        world,
-                        True,
                         [1, 2],
-                        random_actors[0],
                         EnterAction(),
+                        random_actors[0],
                         random_location
                     )
                 )
@@ -528,8 +518,8 @@ class ActionsBeliefsActionsTask(Task):
                 story.append(
                     Question(
                         idx_support,
-                        random_actors[0],
                         SearchAction(),
+                        random_actors[0],
                         random_object,
                         believe_loc,
                     )
@@ -545,8 +535,8 @@ class ActionsBeliefsActionsTask(Task):
                 story.append(
                     Question(
                         idx_support,
-                        random_actors[1],
                         BelieveAgentSearchLocationAction(),
+                        random_actors[1],
                         random_actors[0],
                         random_object,
                         believe_loc,
@@ -561,8 +551,8 @@ class ActionsBeliefsActionsTask(Task):
                 story.append(
                     Question(
                         idx_support,
-                        random_object,
                         Exist(),
+                        random_object,
                         loc,
                     )
                 )
@@ -575,8 +565,8 @@ class ActionsBeliefsActionsTask(Task):
                 story.append(
                     Question(
                         idx_support,
-                        random_object,
                         ExistBeginning(),
+                        random_object,
                         loc,
                     )
                 )

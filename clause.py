@@ -5,7 +5,8 @@ class Clause(object):
 
     def __init__(self, observers, action, *args):
 
-        assert 0 not in observers, "Observer IDs must be 1-indexed"
+        if observers is not None:
+            assert 0 not in observers, "Observer IDs must be 1-indexed"
         self.observers = observers
         self.action = action
         self.args = args
@@ -19,7 +20,6 @@ class Clause(object):
 class Question(Clause):
 
     def __init__(self, idx_support, action, *args):
-        assert 0 not in idx_support, "Support indices must be 1-indexed"
         self.idx_support = idx_support
         super().__init__(None, action, *args)
 
