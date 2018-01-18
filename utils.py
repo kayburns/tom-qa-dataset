@@ -29,9 +29,7 @@ def is_file(f):
     return f
 
 
-
 def mkdir_p(path):
-    # Copied from http://stackoverflow.com/questions/600268/mkdir-p-functionality-in-python
     try:
         os.makedirs(path)
     except OSError as exc:  # Python >2.5
@@ -40,7 +38,6 @@ def mkdir_p(path):
         else:
             raise
     return path
-
 
 
 def remove_extension(path):

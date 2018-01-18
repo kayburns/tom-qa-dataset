@@ -7,11 +7,13 @@ class Action(object):
         self.templates = templates
 
     def render_declarative(self, *args):
-        assert 'declarative' in self.templates and len(self.templates['declarative']) > 0
+        assert 'declarative' in self.templates and \
+            len(self.templates['declarative']) > 0
         return np.random.choice(self.templates['declarative']) % args
 
     def render_interrogative(self, *args):
-        assert 'interrogative' in self.templates and len(self.templates['interrogative']) > 0, str(self.templates)
+        assert 'interrogative' in self.templates and \
+            len(self.templates['interrogative']) > 0, str(self.templates)
         return np.random.choice(self.templates['interrogative']) % args
 
 

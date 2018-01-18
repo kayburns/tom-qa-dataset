@@ -23,9 +23,8 @@ def generate_sally_anne_tasks(world_paths,
                               exit_prob_choices,
                               search_prob_choices,
                               informant_prob_choices,
-                              theory_of_mind_test_prob_choices,
                               num_questions=5,
-                             ):
+                              ):
 
     mkdir_p(output_dir_path)
 
@@ -152,27 +151,24 @@ def generate_sally_anne_tasks(world_paths,
             for exit_prob in exit_prob_choices:
                 for search_prob in search_prob_choices:
                     for informant_prob in informant_prob_choices:
-                        #for theory_of_mind_test_prob in theory_of_mind_test_prob_choices:
-                        if True:
-
-                            #folder_name = '%s_nex_%d_exitp_%.2f_searchp_%.2f_informp_%.2f_tomp_%.2f' % (world_name, num_stories, exit_prob, search_prob, informant_prob, theory_of_mind_test_prob)
                             folder_name = '%s_nex_%d_exitp_%.2f_searchp_%.2f_informp_%.2f' % (world_name, num_stories, exit_prob, search_prob, informant_prob)
                             logging.info("Creating Sally-Anne task in %s..." % folder_name)
                             mkdir_p(os.path.join(output_dir_path, folder_name))
 
-                            ## Symlink the bAbi data
-                            #babi_subdir = 'en' if num_stories < 5000 else 'en-10k'
-                            #for filepath in glob.glob(os.path.join(babi_dir_path, babi_subdir, '*train.txt')):
-                            #    os.symlink(filepath, os.path.join(output_dir_path, folder_name, os.path.basename(filepath)))
+                            '''
+                            # Symlink the bAbi data
+                            babi_subdir = 'en' if num_stories < 5000 else 'en-10k'
+                            for filepath in glob.glob(os.path.join(babi_dir_path, babi_subdir, '*train.txt')):
+                                os.symlink(filepath, os.path.join(output_dir_path, folder_name, os.path.basename(filepath)))
+                            '''
 
-                            # Write test
+                            # Write test stories to file
                             with open(os.path.join(output_dir_path, folder_name, 'true_belief_task_firstord_test.txt'), 'w') as f:
                                 f.write('\n'.join(true_belief_test_story_firstord[:int(num_stories / num_questions)]))
                             with open(os.path.join(output_dir_path, folder_name, 'false_belief_task_firstord_test.txt'), 'w') as f:
                                 f.write('\n'.join(false_belief_test_story_firstord[:int(num_stories / num_questions)]))
                             with open(os.path.join(output_dir_path, folder_name, 'false_false_belief_task_firstord_test.txt'), 'w') as f:
                                 f.write('\n'.join(false_false_belief_test_story_firstord[:int(num_stories / num_questions)]))
-
 
                             with open(os.path.join(output_dir_path, folder_name, 'true_belief_task_secondord_test.txt'), 'w') as f:
                                 f.write('\n'.join(true_belief_test_story_secondord[:int(num_stories / num_questions)]))
@@ -297,6 +293,7 @@ def generate_sally_anne_tasks(world_paths,
                                 i += 1 * num_questions
                             story = '\n'.join(story)
 
+                            # Write the stories to file
                             with open(os.path.join(output_dir_path, folder_name, filename), 'w') as f:
                                 f.write(story)
 
@@ -341,13 +338,12 @@ def parse_args(args):
                         action='append',
                         help='')
 
-    parser.add_argument('-pt', '--prob_theory_of_mind_test', dest='theory_of_mind_test_prob_choices', type=float,
-                        action='append',
-                        help='')
-
     parsed = parser.parse_args(args)
 
-    if parsed.sally_anne is True and parsed.search_prob_choices is None or parsed.exit_prob_choices is None:
+    if parsed.sally_anne is True and \
+       parsed.search_prob_choices is None or \
+       parsed.informant_prob_choices is None or \
+       parsed.exit_prob_choices is None:
         raise argparse.ArgumentTypeError("Parameters undefined for the Sally-Anne task.")
 
     return parsed
@@ -366,9 +362,7 @@ def main(args=sys.argv[1:]):
                                   exit_prob_choices=args.exit_prob_choices,
                                   search_prob_choices=args.search_prob_choices,
                                   informant_prob_choices=args.informant_prob_choices,
-                                  theory_of_mind_test_prob_choices=args.theory_of_mind_test_prob_choices,
-                                 )
-
+                                  )
 
 
 if __name__ == "__main__":

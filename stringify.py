@@ -1,7 +1,6 @@
 import numpy as np
 
 
-#def stringify(story, knowledge, config):
 def stringify(story):
 
     lines = []
@@ -16,18 +15,18 @@ def stringify(story):
         # Capitalize the line
         line = line[0].upper() + line[1:]
 
-        # Prepend the number
+        # Prepend the line number
         line = '%d %s' % (i + 1, line)
 
-        # Append support if necessary
-        if hasattr(story[i], 'idx_support') and story[i].idx_support is not None:
-            line += '\t%s' % ' '.join([str(x + 1) for x in story[i].idx_support])
+        # Append supporting lines indices if necessary
+        if hasattr(story[i], 'idx_support') and story[i].idx_support:
+            line += '\t%s' % ' '.join([str(x + 1)
+                                       for x in story[i].idx_support])
 
         lines.append(line)
 
         # Increment counters
         i += 1
-        #j += template.clauses #TODO: handle multiple-clause templates
         j += 1
 
         if i >= len(story):
