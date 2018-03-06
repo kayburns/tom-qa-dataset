@@ -5,16 +5,214 @@ import glob
 import numpy as np
 import os
 import sys
+import random
+import itertools
 
 
 from stringify import stringify
 from tasks import \
     ActionsBeliefsTask, \
+    ActionsBeliefsActionsTask, \
     BeliefsActionsTask, \
-    ActionsBeliefsActionsTask
+    TFTFBeliefsTask
 from utils import is_file, mkdir_p, remove_extension
 from world import World
 
+def generate_tasks_with_oracle(world_paths, output_dir_path, num_stories):
+
+    mkdir_p(output_dir_path)
+    num_stories_choices = num_stories_choices # TODO: remove
+
+    for world in world_paths:
+
+        w = World()
+        w.load(world)
+        world_name = remove_extension(world)
+
+        task = TFTFBeliefsTask() # ignore all fields set in constructor, not used
+        
+        folder_name = '%s_nex_%d' % (world_name, num_stories_choices)
+        logging.info("Creating New task in %s..." % folder_name)
+        mkdir_p(os.path.join(output_dir_path, folder_name))
+        
+        ########################################
+        ############### Training ###############
+        ########################################
+        
+        with open(os.path.join(output_dir_path, folder_name, 'qa21_task_AB_train.txt'), 'w') as f:
+            stories = []
+            for i in num_stories_choices:
+                
+                story = task.generate_story(w).values() # list of lists of clauses
+                stories.extend(list(itertools.chain(*story)))
+                f.write('\n'.join(stringify(story)))
+                f.write('\n')
+
+
+        ########################################
+        ######### Validation and Test ##########
+        ########################################
+        
+        """
+        logging.info("Creating val cases %s..." % folder_name)
+        for i in range(int(num_stories_choices * .5)):
+            j = i % 9
+            if j == 0:
+                actors = w.get_actors()
+                locations = w.get_locations()
+                objects = w.get_objects()
+                containers = w.get_containers()
+
+                random_actors = np.random.choice(actors, size=3*9, replace=False)
+                random_location = np.random.choice(locations, size=9, replace=False)
+                random_object = np.random.choice(objects, size=9, replace=False)
+                random_containers = np.random.choice(containers, size=2*9, replace=False)
+
+            stories = task.generate_story(w, random_actors[j*3:(j+1)*3], random_location[j], random_object[j], random_containers[j*2:(j+1)*2]) # dict of lists
+
+            with open(os.path.join(output_dir_path, folder_name, 'true_belief_val_test.txt'), 'a') as f:
+                prev_str = ''
+                for story in stories['TrueBelief']: # don't need to shuffle for training
+                    prev_str = '\n'.join([prev_str] + stringify(story))
+                f.write(prev_str)
+            with open(os.path.join(output_dir_path, folder_name, 'false_belief_val_test.txt'), 'a') as f:
+                prev_str = ''
+                for story in stories['FalseBelief']: # don't need to shuffle for training
+                    prev_str = '\n'.join([prev_str] + stringify(story))
+                f.write(prev_str)
+            with open(os.path.join(output_dir_path, folder_name, 'second_order_false_belief_val_test.txt'), 'a') as f:
+                prev_str = ''
+                for story in stories['SecondOrderFalseBelief']: # don't need to shuffle for training
+                    prev_str = '\n'.join([prev_str] + stringify(story))
+                f.write(prev_str)
+
+        
+        # for test generate file for each type of story
+        logging.info("Creating test cases %s..." % folder_name)
+        for i in range(int(num_stories_choices * .5)):
+            stories = task.generate_story(w) # dict of lists
+            
+            with open(os.path.join(output_dir_path, folder_name, 'true_belief_test.txt'), 'a') as f:
+                prev_str = ''
+                for story in stories['TrueBelief']: # don't need to shuffle for training
+                    prev_str = '\n'.join([prev_str] + stringify(story))
+                f.write(prev_str)
+            with open(os.path.join(output_dir_path, folder_name, 'false_belief_test.txt'), 'a') as f:
+                prev_str = ''
+                for story in stories['FalseBelief']: # don't need to shuffle for training
+                    prev_str = '\n'.join([prev_str] + stringify(story))
+                f.write(prev_str)
+            with open(os.path.join(output_dir_path, folder_name, 'second_order_false_belief_test.txt'), 'a') as f:
+                prev_str = ''
+                for story in stories['SecondOrderFalseBelief']: # don't need to shuffle for training
+                    prev_str = '\n'.join([prev_str] + stringify(story))
+                f.write(prev_str)
+        """
+
+def generate_new_tasks(world_paths,
+                           output_dir_path,
+                           num_stories_choices,
+                          ):
+
+    mkdir_p(output_dir_path)
+    num_stories_choices = num_stories_choices[0] # TODO: remove
+
+    for world in world_paths:
+
+        w = World()
+        w.load(world)
+        world_name = remove_extension(world)
+
+        # Training
+        task = TFTFBeliefsTask() # ignore all fields set in constructor, not used
+        
+        folder_name = '%s_nex_%d_correct_numbering' % (world_name, num_stories_choices)
+        logging.info("Creating New task in %s..." % folder_name)
+        mkdir_p(os.path.join(output_dir_path, folder_name))
+        # for training ignore type of story
+        with open(os.path.join(output_dir_path, folder_name, 'qa21_task_AB_train.txt'), 'w') as f:
+            stories = []
+            for i in range(num_stories_choices):
+                j = i % 9
+                if j == 0:
+                        actors = w.get_actors()
+                        locations = w.get_locations()
+                        objects = w.get_objects()
+                        containers = w.get_containers()
+
+                        random_actors = np.random.choice(actors, size=3*9, replace=False)
+                        random_location = np.random.choice(locations, size=9, replace=False)
+                        random_object = np.random.choice(objects, size=9, replace=False)
+                        random_containers = np.random.choice(containers, size=2*9, replace=False)
+                
+                story = task.generate_story(w, random_actors[j*3:(j+1)*3], random_location[j], random_object[j], random_containers[j*2:(j+1)*2]).values() # list of lists of clauses
+                stories.extend(list(itertools.chain(*story)))
+            stor = stories[:]
+            stories = []
+            for i in range(len(stor)//12):
+                stories.extend(stor[i::12])
+            #random.shuffle(stories)
+            #for story in stories:
+            #    f.write('\n'.join(stringify(story)))
+            #    f.write('\n')
+            stories = list(itertools.chain(*stories))
+            f.write('\n'.join(stringify(stories)))
+
+        # for test generate file for each type of story
+        logging.info("Creating val cases %s..." % folder_name)
+        for i in range(int(num_stories_choices * .5)):
+            j = i % 9
+            if j == 0:
+                actors = w.get_actors()
+                locations = w.get_locations()
+                objects = w.get_objects()
+                containers = w.get_containers()
+
+                random_actors = np.random.choice(actors, size=3*9, replace=False)
+                random_location = np.random.choice(locations, size=9, replace=False)
+                random_object = np.random.choice(objects, size=9, replace=False)
+                random_containers = np.random.choice(containers, size=2*9, replace=False)
+
+            stories = task.generate_story(w, random_actors[j*3:(j+1)*3], random_location[j], random_object[j], random_containers[j*2:(j+1)*2]) # dict of lists
+
+            with open(os.path.join(output_dir_path, folder_name, 'true_belief_val_test.txt'), 'a') as f:
+                prev_str = ''
+                for story in stories['TrueBelief']: # don't need to shuffle for training
+                    prev_str = '\n'.join([prev_str] + stringify(story))
+                f.write(prev_str)
+            with open(os.path.join(output_dir_path, folder_name, 'false_belief_val_test.txt'), 'a') as f:
+                prev_str = ''
+                for story in stories['FalseBelief']: # don't need to shuffle for training
+                    prev_str = '\n'.join([prev_str] + stringify(story))
+                f.write(prev_str)
+            with open(os.path.join(output_dir_path, folder_name, 'second_order_false_belief_val_test.txt'), 'a') as f:
+                prev_str = ''
+                for story in stories['SecondOrderFalseBelief']: # don't need to shuffle for training
+                    prev_str = '\n'.join([prev_str] + stringify(story))
+                f.write(prev_str)
+
+        """
+        # for test generate file for each type of story
+        logging.info("Creating test cases %s..." % folder_name)
+        for i in range(int(num_stories_choices * .5)):
+            stories = task.generate_story(w) # dict of lists
+            
+            with open(os.path.join(output_dir_path, folder_name, 'true_belief_test.txt'), 'a') as f:
+                prev_str = ''
+                for story in stories['TrueBelief']: # don't need to shuffle for training
+                    prev_str = '\n'.join([prev_str] + stringify(story))
+                f.write(prev_str)
+            with open(os.path.join(output_dir_path, folder_name, 'false_belief_test.txt'), 'a') as f:
+                prev_str = ''
+                for story in stories['FalseBelief']: # don't need to shuffle for training
+                    prev_str = '\n'.join([prev_str] + stringify(story))
+                f.write(prev_str)
+            with open(os.path.join(output_dir_path, folder_name, 'second_order_false_belief_test.txt'), 'a') as f:
+                prev_str = ''
+                for story in stories['SecondOrderFalseBelief']: # don't need to shuffle for training
+                    prev_str = '\n'.join([prev_str] + stringify(story))
+                f.write(prev_str)
+        """
 
 def generate_sally_anne_tasks(world_paths,
                               output_dir_path,
@@ -277,7 +475,7 @@ def generate_sally_anne_tasks(world_paths,
                         filename = 'qa25_task_AB_BA_ABA_train.txt'
                         tasks = [
                             ActionsBeliefsTask,
-                            BeliefsActionsTask,
+                            # BeliefsActionsTask,
                             ActionsBeliefsActionsTask,
                         ]
                         story = []
@@ -372,6 +570,11 @@ def main(args=sys.argv[1:]):
                                   informant_prob_choices=args.informant_prob_choices,
                                   test_cond_choices=args.test_cond_choices,
                                   )
+    else:
+        generate_new_tasks(world_paths=args.world_paths,
+                           output_dir_path=os.path.join(args.output_dir_path, 'sally_anne'),
+                           num_stories_choices=args.num_stories_choices,
+                          )
 
 
 if __name__ == "__main__":

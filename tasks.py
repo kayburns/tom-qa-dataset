@@ -2,7 +2,9 @@ import numpy as np
 
 
 from clause import Clause, Question
+from oracle import Oracle
 from actions import *
+from collections import defaultdict
 
 
 class Task(object):
@@ -33,6 +35,147 @@ class Task(object):
     def generate_story(self, world):
         raise NotImplementedError("Abstract method.")
 
+class SimBeliefsTask(Task):
+    def generate_story(self, world, length=25, num_agents=2, num_locations=1, num_objects=1):
+        """
+        Returns a list of clauses in story
+        """
+
+        idx_support_dummy = [0]
+        actors = world.get_actors()
+        locations = world.get_locations()
+        objects = world.get_objects()
+        containers = world.get_containers()
+        
+        random_actors = np.random.choice(actors, size=num_agents, replace=False)
+        random_locations = np.random.choice(locations, size=num_locations, replace=False)
+        random_objects = np.random.choice(objects, size=num_objects, replace=False)
+        random_containers = np.random.choice(containers, size=num_locations*2, replace=False)
+        
+        oracle = Oracle(random_actors, random_locations, random_objects)
+        
+        # Populate locations in the oracle with containers
+        locations = oracle.locations
+        for i in range(len(random_locations)):
+            location = random_locations[i]
+            objects = random_obects[2i:2i+2] # TODO: find better way to assign containers
+            locations.set_containers(location, objects)
+        
+        # Generate elements used to build stories
+        # TODO: change from simple true belief story
+        Clause([1, 2], LocationAction(), random_actors[0], random_actors[1], random_location)
+        Question(idx_support_dummy, SearchedAction(), random_actors[1], random_object, random_containers[1])
+                        
+        return story
+        
+class TFTFBeliefsTask(Task):
+    """
+    For each triplet in a set of triplets
+    randomly selected from world, generates 12
+    stories: a true belief, false belief, and second
+    order false belief story each with one of 4
+    questions.
+    
+    Returns dictionary
+    """
+    def generate_story(self, world):
+
+        idx_support_dummy = [0]
+        actors = world.get_actors()
+        locations = world.get_locations()
+        objects = world.get_objects()
+        containers = world.get_containers()
+        
+        random_actors = np.random.choice(actors, size=3, replace=False)
+        random_location = np.random.choice(locations)
+        random_object = np.random.choice(objects)
+        random_containers = np.random.choice(containers, size=2, replace=False)    
+        stories = defaultdict(list) # each entry will hold list of lists of clauses
+        
+        # Generate elements used to build stories
+        clauses = [Clause([1, 2], LocationAction(), random_actors[0],
+                          random_actors[1], random_location),
+                   Clause([1, 2], ObjectLocAction(), random_object,
+                          random_containers[0]),
+                   Clause([1, 2], ExitedAction(), random_actors[1],
+                          random_location),
+                   Clause([1, 3], MoveAction(), random_actors[0],
+                          random_object, random_containers[1]),
+                   Clause([2, 3], TellAction(), random_actors[2],
+                          random_actors[1], random_object),
+                   Clause([1, 2], EnterAction(), random_actors[1],
+                          random_location)] # TODO: improve naming
+            
+        # assumes no support clause    
+        
+        stories['TrueBelief'].append([clauses[0], clauses[1], clauses[3],
+                                      Question(idx_support_dummy, SearchedAction(),
+                                               random_actors[1], random_object,
+                                               random_containers[1]
+                                              )])
+            
+        stories['FalseBelief'].append(clauses[0:4] + [clauses[-1]] +
+                                      [Question(idx_support_dummy, SearchedAction(),
+                                                random_actors[1], random_object,
+                                                random_containers[0]
+                                               )])
+            
+        stories['SecondOrderFalseBelief'].append(clauses +
+                                                 [Question(idx_support_dummy, SearchedAction(),
+                                                           random_actors[1],
+                                                           random_object,
+                                                           random_containers[1]
+                                                          )])
+ 
+        stories['TrueBelief'].append([clauses[0], clauses[1], clauses[3],
+                                      Question(idx_support_dummy, BeliefSearchAction(),
+                                               random_actors[0], random_actors[1],
+                                               random_object, random_containers[1]
+                                              )])
+
+        stories['FalseBelief'].append(clauses[0:4] + [clauses[-1]] +
+                                      [Question(idx_support_dummy, BeliefSearchAction(),
+                                               random_actors[0], random_actors[1],
+                                               random_object, random_containers[0]
+                                              )])
+            
+        stories['SecondOrderFalseBelief'].append(clauses +
+                                     [Question(idx_support_dummy, BeliefSearchAction(),
+                                               random_actors[0], random_actors[1],
+                                               random_object, random_containers[0]
+                                              )])
+        
+        stories['TrueBelief'].append([clauses[0], clauses[1], clauses[3],
+                                      Question(idx_support_dummy, RealityAction(),
+                                               random_object, random_containers[1]
+                                              )])
+
+        stories['FalseBelief'].append(clauses[0:4] + [clauses[-1]] +
+                                      [Question(idx_support_dummy, RealityAction(),
+                                               random_object, random_containers[1]
+                                              )])
+            
+        stories['SecondOrderFalseBelief'].append(clauses +
+                                      [Question(idx_support_dummy, RealityAction(),
+                                               random_object, random_containers[1]
+                                              )])
+        
+        stories['TrueBelief'].append([clauses[0], clauses[1], clauses[3],
+                                      Question(idx_support_dummy, MemoryAction(),
+                                               random_object, random_containers[0]
+                                              )])
+
+        stories['FalseBelief'].append(clauses[0:4] + [clauses[-1]] +
+                                      [Question(idx_support_dummy, MemoryAction(),
+                                               random_object, random_containers[0]
+                                              )])
+            
+        stories['SecondOrderFalseBelief'].append(clauses +
+                                      [Question(idx_support_dummy, MemoryAction(),
+                                               random_object, random_containers[0]
+                                              )])
+                        
+        return stories
 
 class ActionsBeliefsTask(Task):
 
