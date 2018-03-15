@@ -66,10 +66,10 @@ class RealityAction(Action):
 class MemoryAction(Action):
 
     def __init__(self, oracle_start_state, obj):
-        fill = (obj, oracle_start_state.get_object_container(obj))
+        fill = (obj, oracle_start_state[obj])
         templates = {
             'interrogative': [
-                'Where was the %s at the beginning?\t%s',
+                'Where was the %s at the beginning?\t%s' % fill,
             ]
         }
         super().__init__(templates)
@@ -160,6 +160,39 @@ class MoveAction(Action):
             for observer2 in observers:
                 if observer1 != observer2:
                     oracle.set_indirect_belief(observer1, observer2, obj, container)
+                    
+        super().__init__(templates)
+        
+class PeekAction(Action):
+
+    def __init__(self, oracle, args, observers=None):
+        templates = {
+            'declarative': [
+                '%s looked in the %s.' % args,
+            ]
+        }
+        
+        agent, container = args
+        contents = oracle.get_container_obj(container)
+        
+        
+        if not observers:
+            observers = []
+        
+        observers.append(agent)
+        # set direct beliefs
+        for observer in observers:
+            for obj in contents:
+                oracle.set_direct_belief(observer, obj, container)
+         
+        
+        # set indirect beliefs
+        for observer1 in observers:
+            for observer2 in observers:
+                if observer1 != observer2:
+                    for obj in contents:
+                        oracle.set_indirect_belief(observer1, observer2, obj, container)
+        
                     
         super().__init__(templates)
 

@@ -11,11 +11,100 @@ import itertools
 
 from stringify import stringify
 from tasks import \
-    All_Tasks
+    All_Tasks, \
+    Specify_Tasks
 from utils import is_file, mkdir_p, remove_extension
 from world import World
 
-def generate_tasks_with_oracle(world_paths, output_dir_path, num_stories):
+def generate_tasks_with_oracle_fixed_count(world_paths, output_dir_path, n):
+    """
+    Generates stories with guarantee that
+    each task is seen n times.
+    """
+    mkdir_p(output_dir_path)
+    n = n[0] # TODO: remove
+
+    for world in world_paths:
+
+        w = World()
+        w.load(world)
+        world_name = remove_extension(world)
+
+        task = Specify_Tasks()
+        
+        folder_name = '%s_nex_%d' % (world_name, n)
+        logging.info("Creating New task in %s..." % folder_name)
+        mkdir_p(os.path.join(output_dir_path, folder_name))
+        
+        with open(os.path.join(output_dir_path, folder_name, 'qa21_task_AB_train.txt'), 'w') as f:
+            stories = []
+            
+            # generate all combinations of tasks and questions
+            tasks = ['tb', 'fb', 'sofb']
+            questions = ['memory', 'reality', 'belief', 'search']
+            task_questions = list(itertools.product(tasks, questions)) * n
+            random.shuffle(task_questions)
+            
+            # fixed to 5 per story
+            for k in zip(*[iter(task_questions)]*5):
+                ts, qs = zip(*k)
+                story = task.generate_story(w, 5, tasks=ts, questions=qs, num_agents=4, num_locations=6)
+                f.write('\n'.join(stringify(story)))
+                f.write('\n')
+        
+        with open(os.path.join(output_dir_path, folder_name, 'true_belief_val.txt'), 'w') as f:
+            stories = []
+            
+            for i in range(n):
+                
+                story = task.generate_story(w, 4, ['tb']*4, questions, num_agents=4, num_locations=6)
+                f.write('\n'.join(stringify(story)))
+                f.write('\n')
+        
+        with open(os.path.join(output_dir_path, folder_name, 'false_belief_val.txt'), 'w') as f:
+            stories = []
+            for i in range(n):
+                
+                story = task.generate_story(w, 4, ['fb']*4, questions, num_agents=4, num_locations=6)
+                f.write('\n'.join(stringify(story)))
+                f.write('\n')
+                
+        with open(os.path.join(output_dir_path, folder_name, 'sofb_val.txt'), 'w') as f:
+            stories = []
+            for i in range(n):
+                
+                story = task.generate_story(w, 4, ['sofb']*4, questions, num_agents=4, num_locations=6)
+                f.write('\n'.join(stringify(story)))
+                f.write('\n')
+        
+        with open(os.path.join(output_dir_path, folder_name, 'true_belief_test.txt'), 'w') as f:
+            stories = []
+            
+            for i in range(n):
+                
+                story = task.generate_story(w, 4, ['tb']*4, questions, num_agents=4, num_locations=6)
+                f.write('\n'.join(stringify(story)))
+                f.write('\n')
+        
+        with open(os.path.join(output_dir_path, folder_name, 'false_belief_test.txt'), 'w') as f:
+            stories = []
+            for i in range(n):
+                
+                story = task.generate_story(w, 4, ['fb']*4, questions, num_agents=4, num_locations=6)
+                f.write('\n'.join(stringify(story)))
+                f.write('\n')
+                
+        with open(os.path.join(output_dir_path, folder_name, 'sofb_test.txt'), 'w') as f:
+            stories = []
+            for i in range(n):
+                
+                story = task.generate_story(w, 4, ['sofb']*4, questions, num_agents=4, num_locations=6)
+                f.write('\n'.join(stringify(story)))
+                f.write('\n')
+
+
+
+def generate_tasks_with_oracle_randomly(world_paths, output_dir_path, num_stories):
 
     mkdir_p(output_dir_path)
     num_stories = num_stories[0] # TODO: remove
@@ -41,7 +130,7 @@ def generate_tasks_with_oracle(world_paths, output_dir_path, num_stories):
                 f.write('\n'.join(stringify(story)))
                 f.write('\n')
         
-        with open(os.path.join(output_dir_path, folder_name, 'true_belief.txt'), 'w') as f:
+        with open(os.path.join(output_dir_path, folder_name, 'true_belief_test.txt'), 'w') as f:
             stories = []
             for i in range(num_stories):
                 
@@ -50,7 +139,7 @@ def generate_tasks_with_oracle(world_paths, output_dir_path, num_stories):
                 f.write('\n'.join(stringify(story)))
                 f.write('\n')
         
-        with open(os.path.join(output_dir_path, folder_name, 'false_belief.txt'), 'w') as f:
+        with open(os.path.join(output_dir_path, folder_name, 'false_belief_test.txt'), 'w') as f:
             stories = []
             for i in range(num_stories):
                 
@@ -59,7 +148,7 @@ def generate_tasks_with_oracle(world_paths, output_dir_path, num_stories):
                 f.write('\n'.join(stringify(story)))
                 f.write('\n')
                 
-        with open(os.path.join(output_dir_path, folder_name, 'sofb.txt'), 'w') as f:
+        with open(os.path.join(output_dir_path, folder_name, 'sofb_test.txt'), 'w') as f:
             stories = []
             for i in range(num_stories):
                 
@@ -144,9 +233,9 @@ def main(args=sys.argv[1:]):
                                   test_cond_choices=args.test_cond_choices,
                                   )
     else:
-        generate_tasks_with_oracle(world_paths=args.world_paths,
+        generate_tasks_with_oracle_fixed_count(world_paths=args.world_paths,
                            output_dir_path=os.path.join(args.output_dir_path, 'sally_anne'),
-                           num_stories=args.num_stories_choices,
+                           n=args.num_stories_choices,
                           )
 
 

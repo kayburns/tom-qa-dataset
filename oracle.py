@@ -3,6 +3,7 @@ The Oracle class keeps track of all object
 and agent locations as well as a map of
 beliefs about object and agent locations.
 """
+import copy
 
 class LocationMap(object):
 
@@ -28,18 +29,18 @@ class MemoryMap(object):
     def __init__(self, agents, objects):
         
         obj_dict = {obj : None for obj in objects}
-        mem_dict = {agent : obj_dict.copy() for agent in agents}
+        mem_dict = {agent : copy.deepcopy(obj_dict) for agent in agents}
         
         # Dictionary of dictionaries mapping
         # agents to objects to containers. Represents
         # agents' belief about location of containers.
-        self.direct_beliefs = mem_dict
+        self.direct_beliefs = copy.deepcopy(mem_dict)
         
         # Dictionary of dictionaries of dictionaries
         # mapping agents to direct belief dictionaries.
         # Represents agents' belief about other agents'
         # beliefs about location of containers.
-        self.indirect_beliefs = {agent : mem_dict.copy() for agent in agents}
+        self.indirect_beliefs = {agent : copy.deepcopy(mem_dict) for agent in agents}
 
 class Oracle(object):
 
