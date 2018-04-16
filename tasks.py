@@ -23,7 +23,7 @@ def sample_question(oracle_start_state, oracle, agent1, agent2, obj, question):
         elif question == 'belief':
             return questions[2]
         elif question == 'search':
-            return questions[0] # fist agent search unused
+            return questions[1] # first agent search unused
     return np.random.choice(questions)
 
 #######################################
@@ -70,9 +70,9 @@ def write_true_belief_chapter(start_state, oracle, location, agent_ids, all_agen
     if oracle.get_location(a2) == location:
         chapter.extend([Clause(agent_ids, LocationAction(oracle, (a2, location)))])
     else:
-        chapter.extend([Clause(agent_ids, EnterAction(oracle, (a2, location)))])
-    
-    chapter.extend([
+        chapter.extend([Clause(agent_ids, EnterAction(oracle, (a2, location), [a1]))])
+            
+    chapter.extend([ 
         Clause(agent_ids, ObjectLocAction(oracle, obj, [a1, a2])),
         Clause(agent_ids, MoveAction(oracle, (a1, obj, container_2), [a2])),
         #TODO: fancy inheritance to copy start state
@@ -119,13 +119,13 @@ def write_false_belief_chapter(start_state, oracle, location, agent_ids, all_age
     if oracle.get_location(a2) == location:
         chapter.extend([Clause(agent_ids, LocationAction(oracle, (a2, location)))])
     else:
-        chapter.extend([Clause(agent_ids, EnterAction(oracle, (a2, location)))])
+        chapter.extend([Clause(agent_ids, EnterAction(oracle, (a2, location), [a1]))])
 
     chapter.extend([
         Clause(agent_ids, ObjectLocAction(oracle, obj, [a1, a2])),
         Clause(agent_ids, ExitedAction(oracle, (a2))),
         Clause([agent_ids[0]], MoveAction(oracle, (a1, obj, container_2))),
-        Clause(agent_ids, EnterAction(oracle, (a2, location))),
+        #Clause(agent_ids, EnterAction(oracle, (a2, location))),
         # TODO: fancy inheritance to copy start state
         sample_question(start_state, oracle, a1, a2, obj, question)
     ])
@@ -170,7 +170,7 @@ def write_second_order_false_belief_chapter(start_state, oracle, location, agent
     if oracle.get_location(a2) == location:
         chapter.extend([Clause(agent_ids, LocationAction(oracle, (a2, location)))])
     else:
-        chapter.extend([Clause(agent_ids, EnterAction(oracle, (a2, location)))])
+        chapter.extend([Clause(agent_ids, EnterAction(oracle, (a2, location), [a1]))])
 
     chapter.extend([
         Clause(agent_ids, ObjectLocAction(oracle, obj, [a1, a2])),
@@ -178,8 +178,6 @@ def write_second_order_false_belief_chapter(start_state, oracle, location, agent
         Clause([agent_ids[0]], MoveAction(oracle, (a1, obj, container_2))),
         Clause([agent_ids[0]], ExitedAction(oracle, (a1))),
         Clause([agent_ids[1]], EnterAction(oracle, (a2, location))),
-        Clause([agent_ids[1]], PeekAction(oracle, (a2, container_2))),
-        Clause(agent_ids, EnterAction(oracle, (a1, location))),
         sample_question(start_state, oracle, a1, a2, obj, question)
     ])
       
@@ -267,7 +265,7 @@ class All_Tasks(Task):
         return story
     
 class Specify_Tasks(Task):
-    def generate_story(self, world, tasks_per_story, tasks, questions, num_agents=6, num_locations=3):
+    def generate_story(self, world, tasks_per_story, tasks, questions, num_agents=6, num_locations=3, statement_noise=0):
         """
         Allows user to specify chapter and question for
         each task in story.
@@ -278,6 +276,9 @@ class Specify_Tasks(Task):
         :questions: list with length of tasks per story.
         Each entry is a string in the set {'memory',
         'reality', 'belief', 'search'}
+
+        :statement_noise: probability of encountering noise
+        sentence like 'The dog ran through the kitchen.'
         """ 
 
         idx_support_dummy = [0]
@@ -316,6 +317,17 @@ class Specify_Tasks(Task):
             location = np.random.choice(random_locations)
             agent_ids = np.random.choice(range(len(random_actors)), size=2, replace=False)
             story.extend(chapter(start_state, oracle, location, agent_ids, random_actors, questions[i]))
+            
+        if statement_noise:
+            noisy_story = []
+            prev_i = 0
+            noise = [i for i in range(len(story)) if np.random.rand() < statement_noise]
+            for i in noise:
+                noisy_story.extend(story[prev_i:i] + [Clause([], NoiseAction())])
+                prev_i = i
+            noisy_story.extend(story[prev_i:])
+            
+            return noisy_story
                         
         return story
         
