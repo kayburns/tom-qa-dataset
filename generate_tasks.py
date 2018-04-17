@@ -13,6 +13,7 @@ from stringify import stringify
 from tasks import \
     All_Tasks, \
     Specify_Tasks
+#from reorder_tasks import Specify_Tasks_Reorder
 from utils import is_file, mkdir_p, remove_extension
 from world import World
 
@@ -51,7 +52,8 @@ def generate_tasks_with_oracle_fixed_count(world_paths, output_dir_path, n, nois
                 story = task.generate_story(w, 5, tasks=ts, questions=qs, num_agents=4, num_locations=6)
                 f.write('\n'.join(stringify(story)))
                 f.write('\n')
-        
+
+        #task = Specify_Tasks_Reorder()
         for task_type, question, data_set in itertools.product(tasks, questions, ['val', 'test']):
 
             path = '%s_%s_%s_test.txt' % (task_type, question, data_set)
@@ -61,7 +63,7 @@ def generate_tasks_with_oracle_fixed_count(world_paths, output_dir_path, n, nois
 
                 for i in range(n//4):
     
-                    story = task.generate_story(w, 4, [task_type]*4, questions, num_agents=4, num_locations=6, statement_noise=noise)
+                    story = task.generate_story(w, 4, [task_type]*4, [question]*4, num_agents=4, num_locations=6, statement_noise=noise)
                     f.write('\n'.join(stringify(story)))
                     f.write('\n')
     

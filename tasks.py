@@ -263,7 +263,7 @@ class All_Tasks(Task):
             story.extend(chapter(start_state, oracle, location, agent_ids, random_actors, question))
                         
         return story
-    
+ 
 class Specify_Tasks(Task):
     def generate_story(self, world, tasks_per_story, tasks, questions, num_agents=6, num_locations=3, statement_noise=0):
         """
@@ -330,5 +330,4 @@ class Specify_Tasks(Task):
             return noisy_story
                         
         return story
-        
-        
+       
