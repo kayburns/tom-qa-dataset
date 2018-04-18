@@ -66,7 +66,56 @@ def generate_tasks_with_oracle_fixed_count(world_paths, output_dir_path, n, nois
                     story = task.generate_story(w, 4, [task_type]*4, [question]*4, num_agents=4, num_locations=6, statement_noise=noise)
                     f.write('\n'.join(stringify(story)))
                     f.write('\n')
-    
+ 
+def generate_tasks_with_oracle_fixed_count_1_task_1_story(world_paths, output_dir_path, n, noise=.1):
+    """
+    Generates stories with guarantee that
+    each task is seen n times.
+    """
+    mkdir_p(output_dir_path)
+    n = n[0] # TODO: remove
+
+    for world in world_paths:
+
+        w = World()
+        w.load(world)
+        world_name = remove_extension(world)
+
+        task = Specify_Tasks()
+
+        folder_name = '%s_nex_%d_%d' % (world_name, n, noise*100)
+        logging.info("Creating New task in %s..." % folder_name)
+        mkdir_p(os.path.join(output_dir_path, folder_name))
+
+        tasks = ['tb', 'fb', 'sofb']
+        questions = ['memory', 'reality', 'search', 'belief']
+        with open(os.path.join(output_dir_path, folder_name, 'qa21_task_AB_train.txt'), 'w') as f:
+            stories = []
+
+            # generate all combinations of tasks and questions
+            task_questions = list(itertools.product(tasks, questions)) * n
+            random.shuffle(task_questions)
+
+            # fixed to 5 per story
+            for ts, qs in task_questions:
+                story = task.generate_story(w, 1, tasks=[ts], questions=[qs], num_agents=4, num_locations=6)
+                f.write('\n'.join(stringify(story)))
+                f.write('\n')
+
+        #task = Specify_Tasks_Reorder()
+        for task_type, question, data_set in itertools.product(tasks, questions, ['val', 'test']):
+
+            path = '%s_%s_%s_test.txt' % (task_type, question, data_set)
+
+            with open(os.path.join(output_dir_path, folder_name, path), 'w') as f:
+                stories = []
+
+                for i in range(n):
+
+                    story = task.generate_story(w, 1, [task_type], [question], num_agents=4, num_locations=6, statement_noise=noise)
+                    f.write('\n'.join(stringify(story)))
+                    f.write('\n')
+   
 def generate_tasks_with_oracle_randomly(world_paths, output_dir_path, num_stories):
 
     mkdir_p(output_dir_path)
