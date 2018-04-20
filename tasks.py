@@ -75,7 +75,6 @@ def write_true_belief_chapter(start_state, oracle, location, agent_ids, all_agen
     chapter.extend([ 
         Clause(agent_ids, ObjectLocAction(oracle, obj, [a1, a2])),
         Clause(agent_ids, MoveAction(oracle, (a1, obj, container_2), [a2])),
-        #TODO: fancy inheritance to copy start state
         sample_question(start_state, oracle, a1, a2, obj, question)
     ])
     
@@ -125,7 +124,7 @@ def write_false_belief_chapter(start_state, oracle, location, agent_ids, all_age
         Clause(agent_ids, ObjectLocAction(oracle, obj, [a1, a2])),
         Clause(agent_ids, ExitedAction(oracle, (a2))),
         Clause([agent_ids[0]], MoveAction(oracle, (a1, obj, container_2))),
-        #Clause(agent_ids, EnterAction(oracle, (a2, location))),
+        # Clause(agent_ids, EnterAction(oracle, (a2, location))), # closed container condition
         # TODO: fancy inheritance to copy start state
         sample_question(start_state, oracle, a1, a2, obj, question)
     ])
@@ -178,6 +177,8 @@ def write_second_order_false_belief_chapter(start_state, oracle, location, agent
         Clause([agent_ids[0]], MoveAction(oracle, (a1, obj, container_2))),
         Clause([agent_ids[0]], ExitedAction(oracle, (a1))),
         Clause([agent_ids[1]], EnterAction(oracle, (a2, location))),
+        #Clause([agent_ids[1]], PeekAction(oracle, (a2, container_2))), # closed container condition
+        #Clause([agent_ids[0]], EnterAction(oracle, (a1, location), [a2])), # closed container condition
         sample_question(start_state, oracle, a1, a2, obj, question)
     ])
       
