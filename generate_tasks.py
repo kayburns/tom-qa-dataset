@@ -47,9 +47,10 @@ def generate_tasks_with_oracle_fixed_count_old(world_paths, output_dir_path, n, 
             random.shuffle(task_questions)
 
             # fixed to 5 per story
-            for k in zip(*[iter(task_questions)]*5):
-                ts, qs = zip(*k)
-                story = task.generate_story(w, 5, tasks=ts, questions=qs, num_agents=4, num_locations=6)
+            for ts, qs in task_questions:
+                noise_ts = np.random.choice(['tb', 'fb', 'sofb'], 4).tolist()
+                noise_qs = np.random.choice(questions, 4).tolist()
+                story = task.generate_story(w, 5, tasks=noise_ts+[ts], questions=noise_qs+[qs], num_agents=4, num_locations=6)
                 f.write('\n'.join(stringify(story)))
                 f.write('\n')
 
@@ -138,7 +139,15 @@ def generate_tasks_with_oracle_fixed_count(world_paths, output_dir_path, n, nois
                 story = task.generate_story(w, 5, tasks=ts, questions=qs, num_agents=4, num_locations=6)
                 f.write('\n'.join(stringify(story)))
                 f.write('\n')
-
+            """
+            # fixed to 5 per story
+            for ts, qs in task_questions:
+                noise_ts = np.random.choice(['tb', 'fb', 'sofb'], 4).tolist()
+                noise_qs = np.random.choice(questions, 4).tolist()
+                story = task.generate_story(w, 5, tasks=noise_ts+[ts], questions=noise_qs+[qs], num_agents=4, num_locations=6)
+                f.write('\n'.join(stringify(story)))
+                f.write('\n')
+            """
         #task = Specify_Tasks_Reorder()
         for task_type, question, data_set in itertools.product(tasks, questions, ['val', 'test']):
 
@@ -147,9 +156,9 @@ def generate_tasks_with_oracle_fixed_count(world_paths, output_dir_path, n, nois
             with open(os.path.join(output_dir_path, folder_name, path), 'w') as f:
                 stories = []
 
-                for i in range(n//4):
+                for i in range(n):
     
-                    story = task.generate_story(w, 4, [task_type]*4, [question]*4, num_agents=4, num_locations=6, statement_noise=noise)
+                    story = task.generate_story_qs_at_end(w, 4, [task_type]*4, [question]*4, num_agents=4, num_locations=6, statement_noise=noise)
                     f.write('\n'.join(stringify(story)))
                     f.write('\n')
  
@@ -334,7 +343,7 @@ def main(args=sys.argv[1:]):
                                   test_cond_choices=args.test_cond_choices,
                                   )
     else:
-        generate_tasks_with_oracle_fixed_count_old(world_paths=args.world_paths,
+        generate_tasks_with_oracle_fixed_count(world_paths=args.world_paths,
                            output_dir_path=os.path.join(args.output_dir_path, 'sally_anne'),
                            n=args.num_stories_choices,
                            noise=args.test_noise
