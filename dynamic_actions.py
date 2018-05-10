@@ -212,7 +212,7 @@ class TellAction(Action):
         
 class EnterAction(Action):
 
-    def __init__(self, oracle, args, observers=None):
+    def __init__(self, oracle, args, observers=None, no_world_adjust=False):
         templates = {
             'declarative': [
                 '%s entered the %s.' % args,
@@ -227,14 +227,15 @@ class EnterAction(Action):
         if not observers:
             observers=[]
         observers.append(agent)
-
-        for obj in objs:
-            container = oracle.get_object_container(obj)
-            oracle.set_direct_belief(agent, obj, container)
-            for observer1 in observers:
-                for observer2 in observers:
-                    if observer1 != observer2:
-                        oracle.set_indirect_belief(observer1, observer2, obj, container)
+        
+        if not no_world_adjust:
+            for obj in objs:
+                container = oracle.get_object_container(obj)
+                oracle.set_direct_belief(agent, obj, container)
+                for observer1 in observers:
+                    for observer2 in observers:
+                        if observer1 != observer2:
+                            oracle.set_indirect_belief(observer1, observer2, obj, container)
 
         super().__init__(templates)
         
@@ -243,7 +244,7 @@ class NoiseAction(Action):
     def __init__(self):
         templates = {
             'declarative': [
-                'A dog ran through the kitchen.',
+                'Phone rang.',
             ]
         }
         super().__init__(templates)

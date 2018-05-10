@@ -158,7 +158,7 @@ def generate_tasks_with_oracle_fixed_count(world_paths, output_dir_path, n, nois
 
                 for i in range(n):
     
-                    story = task.generate_story_qs_at_end(w, 4, [task_type]*4, [question]*4, num_agents=4, num_locations=6, statement_noise=noise)
+                    story = task.generate_story_qs_at_end(w, 4, [task_type]*4, [question], num_agents=4, num_locations=6, statement_noise=noise)
                     f.write('\n'.join(stringify(story)))
                     f.write('\n')
  
@@ -343,7 +343,7 @@ def main(args=sys.argv[1:]):
                                   test_cond_choices=args.test_cond_choices,
                                   )
     else:
-        generate_tasks_with_oracle_fixed_count(world_paths=args.world_paths,
+         generate_tasks_with_oracle_fixed_count_1_task_1_story(world_paths=args.world_paths,
                            output_dir_path=os.path.join(args.output_dir_path, 'sally_anne'),
                            n=args.num_stories_choices,
                            noise=args.test_noise

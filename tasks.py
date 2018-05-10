@@ -30,7 +30,7 @@ def sample_question(oracle_start_state, oracle, agent1, agent2, obj, question):
 ############## Chapters ###############
 #######################################
 
-def write_true_belief_chapter(start_state, oracle, location, agent_ids, all_agents, question=None):
+def write_true_belief_chapter(start_state, oracle, location, agent_ids, all_agents, questions=None):
     """
     Creates list of clauses that constitute
     a true belief task.
@@ -75,12 +75,14 @@ def write_true_belief_chapter(start_state, oracle, location, agent_ids, all_agen
     chapter.extend([ 
         Clause(agent_ids, ObjectLocAction(oracle, obj, [a1, a2])),
         Clause(agent_ids, MoveAction(oracle, (a1, obj, container_2), [a2])),
-        sample_question(start_state, oracle, a1, a2, obj, question)
     ])
-    
+
+    for question in questions:
+        chapter.append(sample_question(start_state, oracle, a1, a2, obj, question))
+
     return chapter
 
-def write_false_belief_chapter(start_state, oracle, location, agent_ids, all_agents, question=None):
+def write_false_belief_chapter(start_state, oracle, location, agent_ids, all_agents, questions=None):
     """
     Creates list of clauses that constitute
     a true belief task.
@@ -126,12 +128,15 @@ def write_false_belief_chapter(start_state, oracle, location, agent_ids, all_age
         Clause([agent_ids[0]], MoveAction(oracle, (a1, obj, container_2))),
         # Clause(agent_ids, EnterAction(oracle, (a2, location))), # closed container condition
         # TODO: fancy inheritance to copy start state
-        sample_question(start_state, oracle, a1, a2, obj, question)
+        # sample_question(start_state, oracle, a1, a2, obj, question)
     ])
-    
+ 
+    for question in questions:
+        chapter.append(sample_question(start_state, oracle, a1, a2, obj, question))
+   
     return chapter
 
-def write_second_order_false_belief_chapter(start_state, oracle, location, agent_ids, all_agents, question=None):
+def write_second_order_false_belief_chapter(start_state, oracle, location, agent_ids, all_agents, questions=None):
     """
     Creates list of clauses that constitute
     a true belief task.
@@ -179,9 +184,12 @@ def write_second_order_false_belief_chapter(start_state, oracle, location, agent
         Clause([agent_ids[1]], EnterAction(oracle, (a2, location))),
         #Clause([agent_ids[1]], PeekAction(oracle, (a2, container_2))), # closed container condition
         #Clause([agent_ids[0]], EnterAction(oracle, (a1, location), [a2])), # closed container condition
-        sample_question(start_state, oracle, a1, a2, obj, question)
+        # sample_question(start_state, oracle, a1, a2, obj, question)
     ])
       
+    for question in questions:
+        chapter.append(sample_question(start_state, oracle, a1, a2, obj, question))
+
     return chapter
 
 #######################################
@@ -317,7 +325,7 @@ class Specify_Tasks(Task):
             chapter = chapters[tasks[i]]
             location = np.random.choice(random_locations)
             agent_ids = np.random.choice(range(len(random_actors)), size=2, replace=False)
-            story.extend(chapter(start_state, oracle, location, agent_ids, random_actors, questions[i]))
+            story.extend(chapter(start_state, oracle, location, agent_ids, random_actors, [questions[i]]))
 
         if statement_noise:
             noisy_story = []
@@ -383,12 +391,12 @@ class Specify_Tasks(Task):
             chapter = chapters[tasks[i]]
             location = np.random.choice(random_locations)
             agent_ids = np.random.choice(range(len(random_actors)), size=2, replace=False)
-            story.extend(chapter(start_state, oracle, location, agent_ids, random_actors, questions[i])[:-1])
+            story.extend(chapter(start_state, oracle, location, agent_ids, random_actors, []))
 
         chapter = chapters[tasks[-1]]
         location = np.random.choice(random_locations)
         agent_ids = np.random.choice(range(len(random_actors)), size=2, replace=False)
-        story.extend(chapter(start_state, oracle, location, agent_ids, random_actors, questions[-1]))
+        story.extend(chapter(start_state, oracle, location, agent_ids, random_actors, questions))
                
         if statement_noise:
             noisy_story = []
