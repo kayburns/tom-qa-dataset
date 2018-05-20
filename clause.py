@@ -11,9 +11,9 @@ class Clause(object):
         self.action = action
 
     def render(self):
-        return self.action.render_declarative() + \
-            ('\t' + ' '.join([str(x) for x in self.observers])
-             if self.observers is not None else '')
+        return self.action.render_declarative() #+ \
+            #('\t' + ' '.join([str(x) for x in self.observers])
+            # if self.observers is not None else '')
 
 
 class Question(Clause):
