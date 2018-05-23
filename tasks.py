@@ -325,7 +325,7 @@ class Specify_Tasks(Task):
             chapter = chapters[tasks[i]]
             location = np.random.choice(random_locations)
             agent_ids = np.random.choice(range(len(random_actors)), size=2, replace=False)
-            story.extend(chapter(start_state, oracle, location, agent_ids, random_actors, [questions[i]]))
+            story.extend(chapter(start_state, oracle, location, agent_ids, random_actors, questions[i]))
 
         if statement_noise:
             noisy_story = []

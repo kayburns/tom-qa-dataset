@@ -158,7 +158,7 @@ def generate_tasks_with_oracle_fixed_count(world_paths, output_dir_path, n, nois
 
                 for i in range(n):
     
-                    story = task.generate_story_qs_at_end(w, 4, [task_type]*4, [question], num_agents=4, num_locations=6, statement_noise=noise)
+                    story = task.generate_story_qs_at_end(w, 4, [task_type]*4, questions, num_agents=4, num_locations=6, statement_noise=noise)
                     f.write('\n'.join(stringify(story)))
                     f.write('\n')
  
@@ -198,16 +198,16 @@ def generate_tasks_with_oracle_fixed_count_1_task_1_story(world_paths, output_di
                 f.write('\n')
 
         #task = Specify_Tasks_Reorder()
-        for task_type, question, data_set in itertools.product(tasks, questions, ['val', 'test']):
+        for task_type, data_set in itertools.product(tasks, ['val', 'test']):
 
-            path = '%s_%s_%s_test.txt' % (task_type, question, data_set)
+            path = '%s_%s_test.txt' % (task_type, data_set)
 
             with open(os.path.join(output_dir_path, folder_name, path), 'w') as f:
                 stories = []
 
                 for i in range(n):
 
-                    story = task.generate_story(w, 1, [task_type], [question], num_agents=4, num_locations=6, statement_noise=noise)
+                    story = task.generate_story(w, 1, [task_type], [questions], num_agents=4, num_locations=6, statement_noise=noise)
                     f.write('\n'.join(stringify(story)))
                     f.write('\n')
    
@@ -343,7 +343,7 @@ def main(args=sys.argv[1:]):
                                   test_cond_choices=args.test_cond_choices,
                                   )
     else:
-         generate_tasks_with_oracle_fixed_count_1_task_1_story(world_paths=args.world_paths,
+         generate_tasks_with_oracle_fixed_count(world_paths=args.world_paths,
                            output_dir_path=os.path.join(args.output_dir_path, 'sally_anne'),
                            n=args.num_stories_choices,
                            noise=args.test_noise
