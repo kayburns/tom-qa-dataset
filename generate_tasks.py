@@ -169,21 +169,19 @@ def main(args=sys.argv[1:]):
     logging.basicConfig(level=args.logging, format='%(asctime)s\t%(levelname)-8s\t%(message)s')
 
     if args.easy:
-        generate_tasks_with_oracle_fixed_count_1_task_1_story(world_paths=args.world_paths,
-                                  output_dir_path=os.path.join(args.output_dir_path, 'tom_easy_data'),
-                                  babi_dir_path=args.babi_dir_path,
-                                  num_stories_choices=args.num_stories_choices,
-                                  exit_prob_choices=args.exit_prob_choices,
-                                  search_prob_choices=args.search_prob_choices,
-                                  informant_prob_choices=args.informant_prob_choices,
-                                  test_cond_choices=args.test_cond_choices,
-                                  )
+        generate_tasks_with_oracle_fixed_count_1_task_1_story(
+            world_paths=args.world_paths,
+            output_dir_path=os.path.join(args.output_dir_path, 'tom_easy'),
+            n=args.num_stories_choices,
+            noise=args.test_noise
+        )
     else:
-         generate_tasks_with_oracle_fixed_count(world_paths=args.world_paths,
-                           output_dir_path=os.path.join(args.output_dir_path, 'tom'),
-                           n=args.num_stories_choices,
-                           noise=args.test_noise
-                          )
+        generate_tasks_with_oracle_fixed_count(
+            world_paths=args.world_paths,
+            output_dir_path=os.path.join(args.output_dir_path, 'tom'),
+            n=args.num_stories_choices,
+            noise=args.test_noise
+        )
 
 
 if __name__ == "__main__":
