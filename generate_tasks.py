@@ -169,7 +169,7 @@ def main(args=sys.argv[1:]):
     logging.basicConfig(level=args.logging, format='%(asctime)s\t%(levelname)-8s\t%(message)s')
 
     if args.easy:
-        generate_sally_with_oracle_fixed_count_1_task_1_story(world_paths=args.world_paths,
+        generate_tasks_with_oracle_fixed_count_1_task_1_story(world_paths=args.world_paths,
                                   output_dir_path=os.path.join(args.output_dir_path, 'tom_easy_data'),
                                   babi_dir_path=args.babi_dir_path,
                                   num_stories_choices=args.num_stories_choices,

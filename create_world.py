@@ -246,9 +246,3 @@ write_world('world_large.txt',
             np.random.choice(objects, SIZE_LARGE, replace=False),
             np.random.choice(containers, SIZE_LARGE, replace=False),
             np.random.choice(names, SIZE_LARGE, replace=False))
-
-write_world('world_xlarge.txt',
-            np.random.choice(locations, SIZE_XLARGE, replace=False),
-            np.random.choice(objects, SIZE_XLARGE, replace=False),
-            np.random.choice(containers, SIZE_XLARGE, replace=False),
-            np.random.choice(names, SIZE_XLARGE, replace=False))
