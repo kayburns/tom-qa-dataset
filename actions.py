@@ -163,3 +163,108 @@ class InformLocationAction(Action):
             ],
         }
         super().__init__(templates)
+        
+####################################################
+#######  Deterministic Actions for New Task  #######
+####################################################
+
+class SearchedAction(Action):
+
+    def __init__(self):
+        templates = {
+            'interrogative': [
+                'Where will %s look for the %s?\t%s',
+            ]
+        }
+        super().__init__(templates)
+        
+class BeliefSearchAction(Action):
+
+    def __init__(self):
+        templates = {
+            'interrogative': [
+                'Where does %s think that %s searches for the %s?\t%s',
+            ]
+        }
+        super().__init__(templates)
+
+class RealityAction(Action):
+
+    def __init__(self):
+        templates = {
+            'interrogative': [
+                'Where is the %s really?\t%s',
+            ]
+        }
+        super().__init__(templates)
+        
+class MemoryAction(Action):
+
+    def __init__(self):
+        templates = {
+            'interrogative': [
+                'Where was the %s at the beginning?\t%s',
+            ]
+        }
+        super().__init__(templates)
+
+class LocationAction(Action):
+
+    def __init__(self):
+        templates = {
+            'declarative': [
+                '%s and %s are in the %s.',
+            ]
+        }
+        super().__init__(templates)
+
+class ObjectLocAction(Action):
+
+    def __init__(self):
+        templates = {
+            'declarative': [
+                'The %s is in the %s.',
+            ]
+        }
+        super().__init__(templates)
+        
+class ExitedAction(Action):
+
+    def __init__(self):
+        templates = {
+            'declarative': [
+                '%s exited the %s.',
+            ]
+        }
+        super().__init__(templates)
+
+class MoveAction(Action):
+
+    def __init__(self):
+        templates = {
+            'declarative': [
+                '%s moved the %s to the %s.',
+            ]
+        }
+        super().__init__(templates)
+
+class TellAction(Action):
+
+    def __init__(self):
+        templates = {
+            'declarative': [
+                '%s told %s where the %s is.',
+            ]
+        }
+        super().__init__(templates)
+    
+class EnterAction(Action):
+
+    def __init__(self):
+        templates = {
+            'declarative': [
+                '%s entered the %s.',
+            ]
+        }
+        super().__init__(templates)
+    
