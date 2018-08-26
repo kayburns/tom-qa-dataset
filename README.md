@@ -1,6 +1,6 @@
-# python-bAbi-tasks
+# ToM QA Dataset
 
-This repository includes the code to generate data from our EMNLP Paper Evaluating Theory of Mind in Question Answering (link coming soon).
+This repository includes the code to generate data from our EMNLP Paper "Evaluating Theory of Mind in Question Answering" (link coming soon).
 
 ## Getting Started
 
