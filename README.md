@@ -12,7 +12,7 @@ We propose a dataset to evaluate question-answering models with respect to their
 
 The data consists of a set of 3 task and 4 question types, creating 12 total tasks. The tasks are grouped into stories, which are denoted by the numbering at the start of each line. Here is an example of each task type:
 
-<img src=tom_task_types.png>
+<img src=media/tom_task_types.png>
 
 We use for question types for each task:
 - **First-order belief**: Where will Sally look for the milk?
