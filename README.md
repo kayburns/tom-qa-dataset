@@ -36,17 +36,43 @@ We do allow models access to information about who has observed what actions: ea
 
 ## Getting Started
 
-Data generation code is written in python3 and requires the following packages:
-- NumPy
+### Data Generation
+
+Data generation code is written in python3 and requires NumPy.
 
 Running the script `generate_tom.sh` will recreate the entire dataset. The data used in the paper is also available directly in the data folder. Note that because actors and objects are sampled randomly, the script and the data will differ slightly.
 
 The data consists of a set of 3 story templates and 4 question types, creating 12 total tasks. The tasks are grouped into stories, which are denoted by the numbering at the start of each line.
 
-Add: Size of the training, test, and validation datasets.
+- [ ] Add: Size of the training, test, and validation datasets.
 
-Add: what is the supporting sentence
+- [ ] Add: what is the supporting sentence
 In our dataset, it is assumed that the supporting sentence is unused, so a 1 is added at the end of each question. 
 
-Add: why this supervision is useful
+- [ ] Add: why this supervision is useful
 We do allow models access to information about who has observed what actions: each sentence is followed by a series of ids, indicating which agents in the story were present for that action. Ids are constant within stories but not across stories.
+
+### Training: MemN2N
+
+Be sure to install the requirements
+- tensorflow 1.0
+- parallel
+
+Start training by running `run_tasks.sh`.
+- [ ] TODO: rerun on cluster to make sure everything works properly
+
+Analysis code is available in `tom_experiments.py`.
+- [ ] TODO: add endpoints to generate plots from paper automatically
+
+### Training: EntNet
+
+Be sure to install the requirements.
+- [ ] TODO: lua, torch, etc
+
+- [ ] TODO: create script that automatically copies/formats data for EntNet
+
+```
+cd models/MemNN/EntNet-babi/
+./format_tom_data.sh <-- TODO!
+th main.lua -task 21
+```
