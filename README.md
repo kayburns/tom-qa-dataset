@@ -36,6 +36,9 @@ We do allow models access to information about who has observed what actions: ea
 
 ## Getting Started
 
+Data generation code is written in python3 and requires the following packages:
+- NumPy
+
 Running the script `generate_tom.sh` will recreate the entire dataset. The data used in the paper is also available directly in the data folder. Note that because actors and objects are sampled randomly, the script and the data will differ slightly.
 
 The data consists of a set of 3 story templates and 4 question types, creating 12 total tasks. The tasks are grouped into stories, which are denoted by the numbering at the start of each line.
