@@ -2,7 +2,7 @@
 
 This repository includes the code to generate data from our EMNLP 2018 Paper "Evaluating Theory of Mind in Question Answering". You can read the paper here: https://arxiv.org/abs/1808.09352
 
-You can find the dataset used in the paper in the directory data. To start running the code jump to [getting started]()
+You can find the dataset used in the paper in the directory data. To start running the code jump to [getting started](https://github.com/kayburns/tom-qa-dataset/blob/master/README.md#getting-started).
 
 ## Motivation
 
