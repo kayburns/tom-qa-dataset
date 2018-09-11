@@ -26,13 +26,9 @@ The reality and memory questions are used to confirm that a model's correct answ
 
 Add: Size of the training, test, and validation datasets.
 
-The format of the data is inspired by the <a href=https://research.fb.com/downloads/babi/> bAbi </a> tasks. 
+The format of the data is similar to the <a href=https://research.fb.com/downloads/babi/> bAbi </a> tasks. The bAbi dataset encodes what sentences in a story are relevant to the given question. We do not use these supporting setences, so a 1 is added at the end of each question. 
 
-Add: what is the supporting sentence
-In our dataset, it is assumed that the supporting sentence is unused, so a 1 is added at the end of each question. 
-
-Add: why this supervision is useful
-We do allow models access to information about who has observed what actions: each sentence is followed by a series of ids, indicating which agents in the story were present for that action. Ids are constant within stories but not across stories.
+The participants in our stories can have different views of the world states. We allow models access to information about who has observed what actions: each sentence is followed by a series of ids, indicating which agents in the story were present for that action. Ids are constant within stories but not across stories.
 
 ## Getting Started
 
