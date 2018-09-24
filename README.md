@@ -25,6 +25,8 @@ The reality and memory questions are used to confirm that a model's correct answ
 
 Each split contains 1000 examples of each task-question combination: 12,000 examples total per split.
 
+There are four versions of the dataset: easy with noise, easy without noise, hard with noise, and hard without noise. Noised datasets include a noise sentence in the test and validation sets that occurs randomly with a 10% probability. The easy dataset only has one task per story and the hard dataset has mutliple. Path names for test and validation files are of the form `{tom or tom_easy}/world_large_nex_1000_{noise: 0 or 10}/{task type}_{question type}_{split}_test`. Training files are available in the same directories and have the name `qa21_task_AB_train.txt`.
+
 The format of the data is similar to the <a href=https://research.fb.com/downloads/babi/> bAbi </a> tasks. The bAbi dataset encodes what sentences in a story are relevant to the given question. We do not use these supporting setences, so a 1 is added at the end of each question. 
 
 The participants in our stories can have different views of the world states. We allow models access to information about who has observed what actions: each sentence is followed by a series of ids, indicating which agents in the story were present for that action. Ids are constant within stories but not across stories.
