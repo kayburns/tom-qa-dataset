@@ -1,0 +1,6 @@
+[submodule "models/EntNet"]
+	path = models/EntNet
+	url = https://github.com/kayburns/EntNet.git
+[submodule "models/MemN2NandMultObs"]
+	path = models/MemN2NandMultObs
+	url = https://github.com/kayburns/MemN2NandMultObs.git
