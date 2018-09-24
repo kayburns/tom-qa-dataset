@@ -1,6 +1,0 @@
-[submodule "models/memn2n"]
-	path = models/memn2n
-	url = https://github.com/kayburns/memn2n.git
-[submodule "models/MemNN"]
-	path = models/MemNN
-	url = https://github.com/kayburns/MemNN.git
