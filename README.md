@@ -23,8 +23,7 @@ We use for question types for each task:
 The first two question tests a model's ability to reason about beliefs and beliefs about beliefs.
 The reality and memory questions are used to confirm that a model's correct answer to the belief question is not due to chance; but because it has a correct understanding of the state of world and others' beliefs. 
 
-
-Add: Size of the training, test, and validation datasets.
+Each split contains 1000 examples of each task-question combination: 12,000 examples total per split.
 
 The format of the data is similar to the <a href=https://research.fb.com/downloads/babi/> bAbi </a> tasks. The bAbi dataset encodes what sentences in a story are relevant to the given question. We do not use these supporting setences, so a 1 is added at the end of each question. 
 
@@ -40,10 +39,7 @@ Running the script `generate_tom.sh` will recreate the entire dataset. The data 
 
 The data consists of a set of 3 story templates and 4 question types, creating 12 total tasks. The tasks are grouped into stories, which are denoted by the numbering at the start of each line.
 
-- [ ] Add: Size of the training, test, and validation datasets.
-
-- [ ] Add: what is the supporting sentence
-In our dataset, it is assumed that the supporting sentence is unused, so a 1 is added at the end of each question. 
+In our dataset, it is assumed that the supporting sentence is unused, so a 1 is added at the end of each question. The supporting sentences are the sentences used to infer the answer.
 
 - [ ] Add: why this supervision is useful
 We do allow models access to information about who has observed what actions: each sentence is followed by a series of ids, indicating which agents in the story were present for that action. Ids are constant within stories but not across stories.
