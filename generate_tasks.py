@@ -16,7 +16,9 @@ from tasks import \
 from utils import is_file, mkdir_p, remove_extension
 from world import World
 
-def generate_tasks_with_oracle_fixed_count(world_paths, output_dir_path, n, noise=.1):
+def generate_tasks_with_oracle_fixed_count(
+    world_paths, output_dir_path, n, noise=.1, train_noise=False
+):
     """
     Generates stories with guarantee that
     each task is seen n times.
@@ -38,17 +40,29 @@ def generate_tasks_with_oracle_fixed_count(world_paths, output_dir_path, n, nois
         
         tasks = ['tb', 'fb', 'sofb']
         questions = ['memory', 'reality', 'search', 'belief']
-        with open(os.path.join(output_dir_path, folder_name, 'qa21_task_AB_train.txt'), 'w') as f:
+        train_file_path = os.path.join(
+            output_dir_path, folder_name, 'qa21_task_AB_train.txt'
+        )
+        with open(train_file_path, 'w') as f:
             stories = []
             
             # generate all combinations of tasks and questions
             task_questions = list(itertools.product(tasks, questions)) * n
             random.shuffle(task_questions)
-            
+
             # fixed to 5 per story
             for k in zip(*[iter(task_questions)]*5):
                 ts, qs = zip(*k)
-                story = task.generate_story(w, 5, tasks=ts, questions=qs, num_agents=4, num_locations=6)
+                if train_noise:
+                    story = task.generate_story(
+                        w, 5, tasks=ts, questions=qs,
+                        num_agents=4, num_locations=6, statement_noise=noise
+                    )
+                else:
+                    story = task.generate_story(
+                        w, 5, tasks=ts, questions=qs,
+                        num_agents=4, num_locations=6
+                    )   
                 f.write('\n'.join(stringify(story)))
                 f.write('\n')
             """
@@ -74,7 +88,9 @@ def generate_tasks_with_oracle_fixed_count(world_paths, output_dir_path, n, nois
                     f.write('\n'.join(stringify(story)))
                     f.write('\n')
  
-def generate_tasks_with_oracle_fixed_count_1_task_1_story(world_paths, output_dir_path, n, noise=.1):
+def generate_tasks_with_oracle_fixed_count_1_task_1_story(
+    world_paths, output_dir_path, n, noise=.1, train_noise=False
+):
     """
     Generates stories with guarantee that
     each task is seen n times.
@@ -96,7 +112,10 @@ def generate_tasks_with_oracle_fixed_count_1_task_1_story(world_paths, output_di
 
         tasks = ['tb', 'fb', 'sofb']
         questions = ['memory', 'reality', 'search', 'belief']
-        with open(os.path.join(output_dir_path, folder_name, 'qa21_task_AB_train.txt'), 'w') as f:
+        train_file_path = os.path.join(
+            output_dir_path, folder_name, 'qa21_task_AB_train.txt'
+        )
+        with open(train_file_path, 'w') as f:
             stories = []
 
             # generate all combinations of tasks and questions
@@ -105,7 +124,16 @@ def generate_tasks_with_oracle_fixed_count_1_task_1_story(world_paths, output_di
 
             # fixed to 5 per story
             for ts, qs in task_questions:
-                story = task.generate_story(w, 1, tasks=[ts], questions=[qs], num_agents=4, num_locations=6)
+                if train_noise:
+                    story = task.generate_story(
+                        w, 1, tasks=[ts], questions=[qs],
+                        num_agents=4, num_locations=6, statement_noise=noise
+                    )
+                else:
+                    story = task.generate_story(
+                        w, 1, tasks=[ts], questions=[qs],
+                        num_agents=4, num_locations=6
+                    )
                 f.write('\n'.join(stringify(story)))
                 f.write('\n')
 
@@ -157,7 +185,10 @@ def parse_args(args):
 
     parser.add_argument('-ptn', '--prob_test_noise', dest='test_noise', type=float,
                         required=True, help='Probability of encountering random noise sentence')
-
+    parser.add_argument(
+        '-tn', '--train_noise', dest='train_noise', type=bool, default=False,
+        help='Whether or not to include noise at training time'
+    )
     parsed = parser.parse_args(args)
 
     return parsed
@@ -173,14 +204,16 @@ def main(args=sys.argv[1:]):
             world_paths=args.world_paths,
             output_dir_path=os.path.join(args.output_dir_path, 'tom_easy'),
             n=args.num_stories_choices,
-            noise=args.test_noise
+            noise=args.test_noise,
+            train_noise=args.train_noise
         )
     else:
         generate_tasks_with_oracle_fixed_count(
             world_paths=args.world_paths,
             output_dir_path=os.path.join(args.output_dir_path, 'tom'),
             n=args.num_stories_choices,
-            noise=args.test_noise
+            noise=args.test_noise,
+            train_noise=args.train_noise
         )
 
 
