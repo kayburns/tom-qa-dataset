@@ -23,14 +23,14 @@ def sample_question(oracle_start_state, oracle, agent1, agent2, obj, question):
         elif question == 'belief':
             return questions[2]
         elif question == 'search':
-            return questions[1] # first agent search unused
+            return questions[1]
     return np.random.choice(questions)
 
-#######################################
-############## Chapters ###############
-#######################################
+# -------------------------------- Chapters ---------------------------------- #
 
-def write_true_belief_chapter(start_state, oracle, location, agent_ids, all_agents, questions=None):
+def write_true_belief_chapter(
+    start_state, oracle, location, agent_ids, all_agents, questions=None
+):
     """
     Creates list of clauses that constitute
     a true belief task.
@@ -50,27 +50,35 @@ def write_true_belief_chapter(start_state, oracle, location, agent_ids, all_agen
     a1, a2 = all_agents[agent_ids[0]], all_agents[agent_ids[1]]
     agent_ids = [aid+1 for aid in agent_ids]
     
-    # pick random object at location
+    # Pick random object at location
     obj = np.random.choice(oracle.get_objects_at_location(location))
     container_1 = oracle.get_object_container(obj)
     
-    # pick random container in locations
+    # Pick random container in locations
     container_candidates = oracle.get_containers(location)[:]
     container_candidates.remove(container_1)
-    container_2 = np.random.choice(container_candidates) # set would be more elegant
+    container_2 = np.random.choice(container_candidates) 
     
     chapter = []
     
-    # move agents into location
+    # Move agents into location
     if oracle.get_location(a1) == location:
-        chapter.extend([Clause([agent_ids[0]], LocationAction(oracle, (a1, location)))])
+        chapter.extend([
+            Clause([agent_ids[0]], LocationAction(oracle, (a1, location)))
+        ])
     else:
-        chapter.extend([Clause([agent_ids[0]], EnterAction(oracle, (a1, location)))])
+        chapter.extend([
+            Clause([agent_ids[0]], EnterAction(oracle, (a1, location)))
+        ])
         
     if oracle.get_location(a2) == location:
-        chapter.extend([Clause(agent_ids, LocationAction(oracle, (a2, location)))])
+        chapter.extend([
+            Clause(agent_ids, LocationAction(oracle, (a2, location)))
+        ])
     else:
-        chapter.extend([Clause(agent_ids, EnterAction(oracle, (a2, location), [a1]))])
+        chapter.extend([
+            Clause(agent_ids, EnterAction(oracle, (a2, location), [a1]))
+        ])
             
     chapter.extend([ 
         Clause(agent_ids, ObjectLocAction(oracle, obj, [a1, a2])),
@@ -78,11 +86,15 @@ def write_true_belief_chapter(start_state, oracle, location, agent_ids, all_agen
     ])
 
     for question in questions:
-        chapter.append(sample_question(start_state, oracle, a1, a2, obj, question))
+        chapter.append(
+            sample_question(start_state, oracle, a1, a2, obj, question)
+        )
 
     return chapter
 
-def write_false_belief_chapter(start_state, oracle, location, agent_ids, all_agents, questions=None):
+def write_false_belief_chapter(
+    start_state, oracle, location, agent_ids, all_agents, questions=None
+):
     """
     Creates list of clauses that constitute
     a true belief task.
@@ -107,7 +119,7 @@ def write_false_belief_chapter(start_state, oracle, location, agent_ids, all_age
     # pick random container in locations
     container_candidates = oracle.get_containers(location)[:]
     container_candidates.remove(container_1)
-    container_2 = np.random.choice(container_candidates) # set would be more elegant
+    container_2 = np.random.choice(container_candidates) 
     
     chapter = []
     
@@ -130,13 +142,15 @@ def write_false_belief_chapter(start_state, oracle, location, agent_ids, all_age
         # TODO: fancy inheritance to copy start state
         # sample_question(start_state, oracle, a1, a2, obj, question)
     ])
- 
+    # JUST ONE QUESTION SPLITS A STRING TODO TODO
     for question in questions:
         chapter.append(sample_question(start_state, oracle, a1, a2, obj, question))
    
     return chapter
 
-def write_second_order_false_belief_chapter(start_state, oracle, location, agent_ids, all_agents, questions=None):
+def write_second_order_false_belief_chapter(
+    start_state, oracle, location, agent_ids, all_agents, questions=None
+):
     """
     Creates list of clauses that constitute
     a true belief task.
@@ -224,70 +238,23 @@ class Task(object):
     def generate_story(self, world):
         raise NotImplementedError("Abstract method.")
 
-class All_Tasks(Task):
-    def generate_story(self, world, tasks_per_story=3, num_agents=6, num_locations=3, task_dist=None):
-        """
-        Returns a list of clauses in story for a
-        simple True Belief task.
-        """ 
-
-        idx_support_dummy = [0]
-        actors = world.get_actors()
-        locations = world.get_locations()
-        objects = world.get_objects()
-        containers = world.get_containers()
-        
-        random_actors = np.random.choice(actors, size=num_agents, replace=False)
-        random_locations = np.random.choice(locations, size=num_locations, replace=False)
-        random_objects = np.random.choice(objects, size=num_locations*2, replace=False)
-        random_containers = np.random.choice(containers, size=num_locations*2, replace=False)
-        
-        oracle = Oracle(random_actors, random_locations, random_objects, random_containers)
-        
-        # Populate locations in the oracle with containers
-        for i in range(len(random_locations)):
-            location = random_locations[i]
-            containers = random_containers[2*i:2*i+2] # TODO: find better way to assign containers
-            oracle.set_containers(location, list(containers))
-            
-        for i in range(len(random_objects)):
-            oracle.set_object_container(random_objects[i], random_containers[i])
-            
-        start_state = oracle.locations.obj_containers.copy()
-        
-        chapters = [write_true_belief_chapter, write_false_belief_chapter, write_second_order_false_belief_chapter]
-        questions = ['memory', 'reality', 'belief', 'search']
-        
-        story = []
-        
-        for i in range(tasks_per_story):
-            
-            if task_dist: # hacky way to distinguish training from test gen cases :(
-                chapter = np.random.choice(chapters, p=task_dist)
-            else:
-                chapter = np.random.choice(chapters)
-            question = np.random.choice(questions)
-            location = np.random.choice(random_locations)
-            agent_ids = np.random.choice(range(len(random_actors)), size=2, replace=False)
-            story.extend(chapter(start_state, oracle, location, agent_ids, random_actors, question))
-                        
-        return story
- 
 class Specify_Tasks(Task):
-    def generate_story(self, world, tasks_per_story, tasks, questions, num_agents=6, num_locations=3, statement_noise=0):
-        """
-        Allows user to specify chapter and question for
-        each task in story.
-        
-        :tasks: list with length of tasks per story. Each
-        entry is a string in the set {'tb','fb','sofb'}
-        
-        :questions: list with length of tasks per story.
-        Each entry is a string in the set {'memory',
-        'reality', 'belief', 'search'}
 
-        :statement_noise: probability of encountering noise
-        sentence like 'The dog ran through the kitchen.'
+    def generate_story(
+        self, world, tasks_per_story, tasks, questions, num_agents=6,
+        num_locations=3, statement_noise=0
+    ):
+        """
+        Allows user to specify chapter and question for each task in story.
+        
+        :tasks: list with length of tasks per story. Each entry is a string in
+        the set {'tb','fb','sofb'}
+        
+        :questions: list with length of tasks per story. Each entry is a string
+        in the set {'memory', 'reality', 'belief', 'search'}
+
+        :statement_noise: probability of encountering noise sentence like 'The
+        dog ran through the kitchen.'
         """ 
 
         idx_support_dummy = [0]
@@ -306,26 +273,30 @@ class Specify_Tasks(Task):
         # Populate locations in the oracle with containers
         for i in range(len(random_locations)):
             location = random_locations[i]
-            containers = random_containers[2*i:2*i+2] # TODO: find better way to assign containers
+            containers = random_containers[2*i:2*i+2] 
             oracle.set_containers(location, list(containers))
             
         for i in range(len(random_objects)):
             oracle.set_object_container(random_objects[i], random_containers[i])
             
         start_state = oracle.locations.obj_containers.copy()
-
         
         chapters = {'tb':write_true_belief_chapter, 'fb':write_false_belief_chapter,
                     'sofb':write_second_order_false_belief_chapter}
         
         story = []
-        
         for i in range(tasks_per_story):
-            
             chapter = chapters[tasks[i]]
             location = np.random.choice(random_locations)
-            agent_ids = np.random.choice(range(len(random_actors)), size=2, replace=False)
-            story.extend(chapter(start_state, oracle, location, agent_ids, random_actors, questions[i]))
+            agent_ids = np.random.choice(
+                range(len(random_actors)), size=2, replace=False
+            )
+            story.extend(
+                chapter(
+                    start_state, oracle, location, agent_ids,
+                    random_actors, [questions[i]]
+                )
+            )
 
         if statement_noise:
             noisy_story = []
@@ -340,70 +311,99 @@ class Specify_Tasks(Task):
                         
         return story
      
-    def generate_story_qs_at_end(self, world, tasks_per_story, tasks, questions, num_agents=6, num_locations=3, statement_noise=0):
+    def generate_story_qs_at_end(
+        self, world, tasks_per_story, tasks, questions, num_agents=6,
+        num_locations=3, statement_noise=0
+    ):
         """
-        Allows user to specify chapter and question for
-        each task in story.
+        Allows user to specify chapter and question for each task in story.
         
-        :tasks: list with length of tasks per story. Each
-        entry is a string in the set {'tb','fb','sofb'}
+        :tasks: list with length of tasks per story. Each entry is a string in
+        the set {'tb','fb','sofb'}
         
-        :questions: list with length of tasks per story.
-        Each entry is a string in the set {'memory',
-        'reality', 'belief', 'search'}
+        :questions: list with length of tasks per story. Each entry is a string
+        in the set {'memory', 'reality', 'belief', 'search'}
 
-        :statement_noise: probability of encountering noise
-        sentence like 'The dog ran through the kitchen.'
+        :statement_noise: probability of encountering noise sentence like 'The
+        dog ran through the kitchen.'
         """ 
 
+        # Fetch agents and objects and select a random subset
         idx_support_dummy = [0]
         actors = world.get_actors()
         locations = world.get_locations()
         objects = world.get_objects()
         containers = world.get_containers()
-        
-        random_actors = np.random.choice(actors, size=num_agents, replace=False)
-        random_locations = np.random.choice(locations, size=num_locations, replace=False)
-        random_objects = np.random.choice(objects, size=num_locations*2, replace=False)
-        random_containers = np.random.choice(containers, size=num_locations*2, replace=False)
-        
-        oracle = Oracle(random_actors, random_locations, random_objects, random_containers)
+
+        random_actors = np.random.choice(
+            actors, size=num_agents, replace=False
+        )
+        random_locations = np.random.choice(
+            locations, size=num_locations, replace=False
+        )
+        random_objects = np.random.choice(
+            objects, size=num_locations*2, replace=False
+        )
+        random_containers = np.random.choice(
+            containers, size=num_locations*2, replace=False
+        )
+
+        # Create the oracle
+        oracle = Oracle(
+            random_actors, random_locations, random_objects, random_containers
+        )
         
         # Populate locations in the oracle with containers
         for i in range(len(random_locations)):
             location = random_locations[i]
-            containers = random_containers[2*i:2*i+2] # TODO: find better way to assign containers
+            containers = random_containers[2*i:2*i+2] 
             oracle.set_containers(location, list(containers))
-            
+
+        # Populate containers with objects
         for i in range(len(random_objects)):
             oracle.set_object_container(random_objects[i], random_containers[i])
             
+        # Need start state for memory question
         start_state = oracle.locations.obj_containers.copy()
 
-        
-        chapters = {'tb':write_true_belief_chapter, 'fb':write_false_belief_chapter,
+        # Create story by task
+        chapters = {'tb':write_true_belief_chapter,
+                    'fb':write_false_belief_chapter,
                     'sofb':write_second_order_false_belief_chapter}
-        
         story = []
-        
         for i in range(tasks_per_story-1):
-            
             chapter = chapters[tasks[i]]
             location = np.random.choice(random_locations)
-            agent_ids = np.random.choice(range(len(random_actors)), size=2, replace=False)
-            story.extend(chapter(start_state, oracle, location, agent_ids, random_actors, []))
-
+            agent_ids = np.random.choice(
+                range(len(random_actors)), size=2, replace=False
+            )
+            story.extend(
+                chapter(
+                    start_state, oracle, location, agent_ids, random_actors, []
+                )
+            )
         chapter = chapters[tasks[-1]]
         location = np.random.choice(random_locations)
-        agent_ids = np.random.choice(range(len(random_actors)), size=2, replace=False)
-        story.extend(chapter(start_state, oracle, location, agent_ids, random_actors, questions))
-               
+        agent_ids = np.random.choice(
+            range(len(random_actors)), size=2, replace=False
+        )
+        story.extend(
+            chapter(
+                start_state, oracle, location, agent_ids, random_actors, questions
+            )
+        )
+        
+        # At the end, at noise sentences randomly
         if statement_noise:
             noisy_story = []
             prev_i = 0
-            noise = [i for i in range(len(story)) if np.random.rand() < statement_noise]
+            noise = [i for i
+                in range(len(story)) if np.random.rand() < statement_noise
+            ]
             for i in noise:
-                noisy_story.extend(story[prev_i:i] + [Clause([], NoiseAction())])
+                noisy_story.extend(
+                    story[prev_i:i] + [Clause([], NoiseAction())]
+                )
                 prev_i = i
             noisy_story.extend(story[prev_i:])
             
