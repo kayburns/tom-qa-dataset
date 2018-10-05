@@ -46,17 +46,10 @@ In our dataset, it is assumed that the supporting sentence used to infer the ans
 - [ ] Add: why this supervision is useful
 We do allow models access to information about who has observed what actions: each sentence is followed by a series of IDs, indicating which agents in the story were present for that action. IDs are constant within stories but not across stories.
 
-### Training: MemN2N
+### Training
 
-Be sure to install the requirements
-- Tensorflow 1.0
-- GNU Parallel
+Instructions for [MemN2N and Multiple Observer Models](https://github.com/kayburns/MemN2NandMultObs), ...
 
-Start training by running `run_tasks.sh`.
-- [ ] TODO: rerun on cluster to make sure everything works properly
-
-Analysis code is available in `tom_experiments.py`.
-- [ ] TODO: add endpoints to generate plots from paper automatically
 
 ### Training: EntNet
 
