@@ -23,7 +23,7 @@ We use four *question types* for each task:
 The first two questions test a model's ability to reason about beliefs and second-order beliefs (beliefs about beliefs).
 The reality and memory questions are used to confirm that a model's correct answer to the belief question is not due to chance, but because it has a correct understanding of the state of the world and the state of others' beliefs. 
 
-Each split contains 1000 examples of each task-question combination: 12,000 examples total per split.
+Each split contains 1000 examples of each task-question combination: 12 000 examples total per split.
 
 There are four versions of the dataset: `easy with noise`, `easy without noise`, `hard with noise`, and `hard without noise`. Noised datasets include a distractor sentence in the test and validation sets that occurs randomly with 10% probability. The easy dataset a single scenario per story, while the the hard dataset has mutliple. Path names for test and validation files are of the form `{tom or tom_easy}/world_large_nex_1000_{noise: 0 or 10}/{task type}_{question type}_{split}_test`. Training files are available in the same directories and have the name `qa21_task_AB_train.txt`.
 
@@ -39,7 +39,7 @@ Data generation code is written in `python3` and requires `NumPy`.
 
 Running the script `generate_tom.sh` will recreate the entire dataset. The data used in the paper is also available directly in the data folder. Note that because actors and objects are sampled randomly, the script and the data will differ slightly.
 
-The data consists of a set of 3 story templates and 4 question types, creating 12 total tasks. The tasks are grouped into stories, which are denoted by the numbering at the start of each line.
+The data consists of a set of 3 task templates and 4 question types, creating 12 total task-question combinations. Several of these task-question scenarios are grouped into stories, which are delimited by the numbering prepended to each line.
 
 In our dataset, it is assumed that the supporting sentence used to infer the answer to each question is unused, so a 1 is added at the end of each question.
 
