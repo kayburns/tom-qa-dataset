@@ -48,22 +48,4 @@ We do allow models access to information about who has observed what actions: ea
 
 ### Training
 
-Instructions for [MemN2N and Multiple Observer Models](https://github.com/kayburns/MemN2NandMultObs), ...
-
-
-### Training: EntNet
-
-Be sure to install the requirements.
-- [ ] TODO: lua, torch, etc
-
-- [ ] TODO: create script that automatically copies/formats data for EntNet
-
-```
-cd models/MemNN/EntNet-babi/
-./format_tom_data.sh <-- TODO!
-th main.lua -task 21
-```
-
-### Training: RelNet
-
-- [ ] TODO: add details on training and eval
+The repository currently only supports memory network and multiple observer, but support for Entity and Relation Networks are coming soon. Instructions for [MemN2N and Multiple Observer Models](https://github.com/kayburns/MemN2NandMultObs).
