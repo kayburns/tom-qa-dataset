@@ -4,3 +4,6 @@
 [submodule "models/MemN2NandMultObs"]
 	path = models/MemN2NandMultObs
 	url = https://github.com/kayburns/MemN2NandMultObs.git
+[submodule "models/relation-network"]
+	path = models/relation-network
+	url = git@github.com:eringrant/relation-network.git
